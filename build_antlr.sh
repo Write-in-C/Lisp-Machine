@@ -1,0 +1,1 @@
+antlr4 -o ./src/main/java/antlr -lib ./src/main/antlr4 -long-messages -no-listener -visitor -package antlr -Xexact-output-dir
