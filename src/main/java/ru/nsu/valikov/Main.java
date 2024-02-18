@@ -1,21 +1,23 @@
 package ru.nsu.valikov;
 
-import antlr.LispLexer;
-import antlr.LispParser;
+import antlr.ClojureLexer;
+import antlr.ClojureParser;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeListener;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.ParseTree;
+import ru.nsu.valikov.generators.TranslationVisitor;
 
 public class Main {
 
     public static void main(String[] args) {
-        var code = "(+ 1 2 3)";
-        var lexer = new LispLexer(CharStreams.fromString(code));
-        var parser = new LispParser(new CommonTokenStream(lexer));
-        var tree = parser.program();
-        var walker = new ParseTreeWalker();
-        var listener = new MyListener();
-        walker.walk(listener, tree);
+        String expression = """
+            (ns hello-world)
+
+            (defn -main []
+                  (println "Hello world!"))""";
+        ClojureLexer lexer = new ClojureLexer(CharStreams.fromString(expression));
+        ClojureParser parser = new ClojureParser(new CommonTokenStream(lexer));
+        ParseTree tree = parser.program();
+        var res = new TranslationVisitor().visit(tree);
     }
 }
