@@ -1,13 +1,45 @@
 lexer grammar Lexer;
 
-PLUS : '+';
+// program
+NS : 'ns';
+
+//FILENAME : EXTENDED_STRING; // change
+
+//basics
 OP : '(';
+
 CP : ')';
 
-NUMBER : DIGIT+ ;
+SO : '[';
 
-WHITESPACE : [ \r\n\t] + -> channel (HIDDEN);
+SC : ']';
 
-DIGIT  :  [0-9];
+IF : 'if';
 
-LETTER : [a-zA-Z];
+DEFN : 'defn';
+
+IDENT : LETTER (DIGIT | LETTER | SYMBOLS)*;
+
+//EXTENDED_STRING
+//    : (SYMBOLS | LETTER | DIGIT)+;
+
+DECIMAL : DIGIT+ ;
+
+BOOLEAN
+    : 'true'
+    | 'false';
+
+NIL : 'nil';
+
+WHITESPACE : [ \r\n\t] + -> skip;
+
+fragment DIGIT  :  [0-9];
+
+fragment LETTER : 'a'..'z' | 'A'..'Z';
+
+fragment SYMBOLS
+    : '_'
+    | '-';
+
+fragment ANY_CHAR : '\\';
+
