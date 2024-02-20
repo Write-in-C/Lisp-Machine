@@ -25,6 +25,14 @@ IDENT : LETTER (DIGIT | LETTER | SYMBOLS)*;
 
 DECIMAL : DIGIT+ ;
 
+// arithmetics
+
+EQ: '=';
+
+MUL: '*';
+
+SUB: '-';
+
 BOOLEAN
     : 'true'
     | 'false';

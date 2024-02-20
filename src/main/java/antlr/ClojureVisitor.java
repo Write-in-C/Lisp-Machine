@@ -71,6 +71,12 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNil(ClojureParser.NilContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ClojureParser#arithmetics}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArithmetics(ClojureParser.ArithmeticsContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ClojureParser#if}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

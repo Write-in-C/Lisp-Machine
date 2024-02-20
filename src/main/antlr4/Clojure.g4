@@ -33,6 +33,7 @@ atom
 //    | keyword
     | boolean
     | nil
+    | arithmetics
     ;
 
 number: DECIMAL; // Add more types
@@ -42,6 +43,12 @@ ident: IDENT;
 boolean: BOOLEAN;
 
 nil : NIL;
+
+arithmetics
+    : EQ
+    | MUL
+    | SUB
+    ;
 
 if : OP IF expression expression expression CP;
 
