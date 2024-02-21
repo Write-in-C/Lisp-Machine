@@ -14,7 +14,7 @@ import java.io.IOException;
 public class TranslationVisitor extends ClojureBaseVisitor<String> {
 
     String file;
-    StringBuilder mem;
+    StringBuilder mem = new StringBuilder();
 
     @Override
     public String visitProgram(ProgramContext ctx) {
