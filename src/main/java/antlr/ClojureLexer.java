@@ -84,11 +84,11 @@ public class ClojureLexer extends Lexer {
 	}
 
 
-	  MakeGenerator gen;
-	  public MakeParser(TokenStream input, MakeGenerator gen) {
-	  super(input);
-	  this.gen = gen;
-	  }
+	//  MakeGenerator gen;
+	//  public MakeParser(TokenStream input, MakeGenerator gen) {
+	//  super(input);
+	//  this.gen = gen;
+	//  }
 
 
 	public ClojureLexer(CharStream input) {

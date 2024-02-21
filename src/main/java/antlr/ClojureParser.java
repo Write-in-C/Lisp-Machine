@@ -91,11 +91,11 @@ public class ClojureParser extends Parser {
 	public ATN getATN() { return _ATN; }
 
 
-	  MakeGenerator gen;
-	  public MakeParser(TokenStream input, MakeGenerator gen) {
-	  super(input);
-	  this.gen = gen;
-	  }
+	//  MakeGenerator gen;
+	//  public MakeParser(TokenStream input, MakeGenerator gen) {
+	//  super(input);
+	//  this.gen = gen;
+	//  }
 
 	public ClojureParser(TokenStream input) {
 		super(input);

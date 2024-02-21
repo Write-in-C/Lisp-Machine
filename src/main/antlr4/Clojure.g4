@@ -3,11 +3,11 @@ grammar Clojure;
 import Lexer;
 
 @members {
-  MakeGenerator gen;
-  public MakeParser(TokenStream input, MakeGenerator gen) {
-  super(input);
-  this.gen = gen;
-  }
+//  MakeGenerator gen;
+//  public MakeParser(TokenStream input, MakeGenerator gen) {
+//  super(input);
+//  this.gen = gen;
+//  }
 }
 
 program : filename expressions EOF;

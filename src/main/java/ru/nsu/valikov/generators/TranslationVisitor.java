@@ -34,12 +34,12 @@ public class TranslationVisitor extends ClojureBaseVisitor<String> {
         return null;
     }
 
-    @Override
-    public String visitIf(IfContext ctx) {
-        var cond = visitExpression(ctx.expression(0));
-        mem.append("if (").append(cond).append(") {\n");
-        
-    }
+//    @Override
+//    public String visitIf(IfContext ctx) {
+//        var cond = visitExpression(ctx.expression(0));
+//        mem.append("if (").append(cond).append(") {\n");
+//
+//    }
 
     @Override
     public String visitExpressions(ExpressionsContext ctx) {
