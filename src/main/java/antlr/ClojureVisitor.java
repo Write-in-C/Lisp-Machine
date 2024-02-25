@@ -41,6 +41,12 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitList(ClojureParser.ListContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ClojureParser#call}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCall(ClojureParser.CallContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ClojureParser#atom}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -70,12 +76,6 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNil(ClojureParser.NilContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ClojureParser#arithmetics}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArithmetics(ClojureParser.ArithmeticsContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ClojureParser#if}.
 	 * @param ctx the parse tree
