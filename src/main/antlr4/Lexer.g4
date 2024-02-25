@@ -18,12 +18,12 @@ IF : 'if';
 
 DEFN : 'defn';
 
-IDENT : LETTER (DIGIT | LETTER | SYMBOLS)*;
+IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB;
 
 //EXTENDED_STRING
 //    : (SYMBOLS | LETTER | DIGIT)+;
 
-DECIMAL : DIGIT+ ;
+INT : DIGIT+ ;
 
 // arithmetics
 

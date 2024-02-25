@@ -18,12 +18,15 @@ expressions : expression*;
 
 expression
     : list
+    | call
     | atom
     | if
     | defn // for now
     ;
 
 list : OP expressions CP;
+
+call : OP ident expressions CP;
 
 atom
     : number
@@ -33,22 +36,16 @@ atom
 //    | keyword
     | boolean
     | nil
-    | arithmetics
+//    | arithmetics
     ;
 
-number: DECIMAL; // Add more types
+number: INT; // Add more types
 
 ident: IDENT;
 
 boolean: BOOLEAN;
 
 nil : NIL;
-
-arithmetics
-    : EQ
-    | MUL
-    | SUB
-    ;
 
 if : OP IF expression expression expression CP;
 
