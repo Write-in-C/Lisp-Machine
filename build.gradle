@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'ru.nsu.valikov'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    javaMainClass = "ru.nsu.valikov.Main"
+}
+
+application {
+    mainClass = javaMainClass
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation("org.antlr:antlr4-runtime:4.13.1")
+}
+
+test {
+    useJUnitPlatform()
+}
