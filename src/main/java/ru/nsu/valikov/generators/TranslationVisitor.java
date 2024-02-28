@@ -47,7 +47,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     boolean shouldPrint = false;
 
     private static Map<String, List<String>> functions = new HashMap<>();
-    //идея хороша, реализация максимальнейшая хуйня. Типо вывод типов местный и мапа переменных
+    //идея хороша, реализация может быть лучше. Например, вывод типов местный и мапа переменных
     private static Map<String, TYPE> localVars = new HashMap<>();
 
     @Override
@@ -138,7 +138,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
     @Override
     public List<Expression> visitExpression(ExpressionContext ctx) {
-        // блять костыль на костыле я ебал
+        // костыль на костыле
         // it must be recursive
         if (ctx.atom() != null) {
             if (ctx.atom().number() != null) {
