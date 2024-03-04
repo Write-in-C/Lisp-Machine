@@ -14,50 +14,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import ru.nsu.valikov.generators.TranslationVisitor.Expression;
-import ru.nsu.valikov.generators.TranslationVisitor.Expression.TYPE;
+import ru.nsu.valikov.compiler.Scopes;
+import ru.nsu.valikov.generators.Expression.TYPE;
 
 public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
-
-    // all translation must be in separate module
-    static class Expression {
-
-        public final TYPE type;
-        public final String value;
-
-
-        Expression(TYPE type, String value) {
-            this.type = type;
-            this.value = value;
-        }
-
-        public enum TYPE {
-            INT,
-            DOUBLE,
-            FUNCTION,
-            BOOLEAN,
-            LIST,
-            NONE; // not inferred
-        }
-    }
 
     String file;
     StringBuilder mem = new StringBuilder();
     boolean shouldPrint = false;
 
     private static Map<String, List<String>> functions = new HashMap<>();
-    //идея хороша, реализация может быть лучше. Например, вывод типов местный и мапа переменных
-    private static Map<String, TYPE> localVars = new HashMap<>();
 
     @Override
     public List<Expression> visitProgram(ProgramContext ctx) {
         file = "out/" + ctx.filename().IDENT().getText() + ".c";
-//        var start = """
-//            #include <stdio.h>
-//
-//            int main() {
-//            """;
-//        mem.append(start);
         try (InputStreamReader stream = new InputStreamReader(
             Objects.requireNonNull(getClass().getResourceAsStream("/c-utils/startup.c")))) {
             var buffer = new char[1024];
@@ -69,12 +39,6 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             e.printStackTrace();
         }
         super.visitProgram(ctx);
-//        var end = """
-//                return 0;
-//            }
-//            """;
-//        mem.append(end);
-//        return super.visitProgram(ctx);
         try (var writer = new PrintWriter(file)) {
             writer.println(mem);
         } catch (IOException e) {
@@ -103,7 +67,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         if (shouldPrint) {
             mem.append(builder);
         }
-        System.out.println(then.get(then.size() - 1).type);
+//        System.out.println(then.get(then.size() - 1).type);
         return List.of(then.get(then.size() - 1));
     }
 
@@ -111,7 +75,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
         var c = 0;
         for (var i : then) {
-            System.out.println(i.type + " " + i.value);
+//            System.out.println(i.type + " " + i.value);
             if (i.type == TYPE.FUNCTION) {
                 c++;
                 builder.append(i.value).append("(");
@@ -141,8 +105,8 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         // it must be recursive
         if (ctx.atom() != null) {
             if (ctx.atom().number() != null) {
-                localVars.put(ctx.atom().getText(), TYPE.INT);
-                return List.of(new Expression(Expression.TYPE.INT, ctx.atom().number().getText()));
+                return List.of(new Expression(Expression.TYPE.INT,
+                    ctx.atom().number().getText()));
             }
             if (ctx.atom().ident() != null) {
                 if (ctx.atom().ident().getText().equals("=")) {
@@ -158,8 +122,11 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
                 if (functions.containsKey("lisp_" + ctx.getText())) {
                     return List.of(new Expression(TYPE.FUNCTION, ctx.getText()));
                 }
+                Scopes.defineNewVariable(ctx.getText(), new Expression(TYPE.NONE));
                 return List.of(new Expression(TYPE.NONE, ctx.getText()));
             }
+            // NONE only for now
+            Scopes.defineNewVariable(ctx.atom().getText(), new Expression(TYPE.NONE));
             return visitAtom(ctx.atom());
         }
         if (ctx.list() != null && ctx.list().expressions() != null) {
@@ -174,6 +141,8 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
     @Override
     public List<Expression> visitDefn(DefnContext ctx) {
+        Scopes.createNew();
+
         var name = "lisp_" + ctx.ident().getText();
         functions.put(name, List.of());
         visitIdent(ctx.ident());
@@ -192,14 +161,16 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
                 mem.append(", ");
             }
             var argName = ctx.idents().ident(i).getText();
-            var argType = localVars.get(argName);
+            var argType = Scopes.getType(argName);
             mem.append(argType).append(" ")
                 .append(argName);
         }
         mem.append(") {\nreturn ");
         shouldPrint = true;
         visitExpressions(ctx.expressions());
+        mem.append(";");
         mem.append("\n}\n");
+        Scopes.deleteLast();
         return null;
     }
 }

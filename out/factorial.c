@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 typedef enum {
     INT,
     LONG,
@@ -8,34 +10,42 @@ typedef enum {
     //...
 } ValueType;
 
+
 typedef struct {
     ValueType type;
     void *value;
 } ClojureValue;
 
-double lisp_add(ClojureValue a, ClojureValue b) {
+ClojureValue lisp_add(ClojureValue a, ClojureValue b) {
     // some exception needs to be thrown
-    if (a.type != INT || b.type != INT) return -1;
-    return (int) a.value + (int) b.value;
+    if (a.type != INT || b.type != INT) exit(1);
+    a.value = (void *) ((int) a.value + (int) b.value);
+    return a;
 }
 
-double lisp_sub(ClojureValue a, ClojureValue b) {
-    if (a.type != INT || b.type != INT) return -1;
-    return (int) a.value - (int) b.value;
+ClojureValue lisp_neg(ClojureValue a) {
+    if (a.type != INT) exit(1);
+    a.value = (void *) -(int) a.value;
+    return a;
 }
 
-double lisp_mul(ClojureValue a, ClojureValue b) {
-    if (a.type != INT || b.type != INT) return -1;
-    return (int) a.value * (int) b.value;
+ClojureValue lisp_sub(ClojureValue a, ClojureValue b) {
+    if (a.type != INT || b.type != INT) exit(1);
+    return lisp_add(a, lisp_neg(b));
 }
 
-double lisp_div(ClojureValue a, ClojureValue b) {
-    if (a.type != INT || b.type != INT) return -1;
-    return (int) a.value / (int) b.value;
+ClojureValue lisp_mul(ClojureValue a, ClojureValue b) {
+    if (a.type != INT || b.type != INT)exit(1);
+    a.value = (void *) ((int) a.value * (int) b.value);
+    return a;
 }
 
-
-int lisp_factorial(null n) {
-return lisp_eq(n, 0) ? 1 : lisp_mul(n, factorial(lisp_sub(n, 1)))
+ClojureValue lisp_div(ClojureValue a, ClojureValue b) {
+    if (a.type != INT || b.type != INT) exit(1);
+    a.value = (void *) ((int) a.value / (int) b.value);
+    return a;
+}
+int lisp_factorial(NONE n) {
+return lisp_eq(n, 0) ? 1 : lisp_mul(n, factorial(lisp_sub(n, 1)));
 }
 
