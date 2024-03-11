@@ -43,7 +43,8 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         try (var writer = new PrintWriter(file)) {
             writer.println(mem);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("unable to write file");
+            System.err.println(e.getMessage());
         }
         return null;
     }
