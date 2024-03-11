@@ -70,7 +70,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             mem.append(builder);
         }
 //        System.out.println(then.get(then.size() - 1).type);
-        return List.of(then.get(then.size() - 1));
+        return List.of(then.getLast());
     }
 
     private static void extracted(List<Expression> then, StringBuilder builder) {
