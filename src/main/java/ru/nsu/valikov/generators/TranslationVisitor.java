@@ -36,7 +36,8 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
                 mem.append(buffer, 0, read);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("unable to read file");
+            System.err.println(e.getMessage());
         }
         super.visitProgram(ctx);
         try (var writer = new PrintWriter(file)) {
