@@ -83,7 +83,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
                 builder.append(i.value).append("(");
             } else {
                 builder.append(i.value);
-                if (c > 0 && i != then.get(then.size() - 1)) {
+                if (c > 0 && i != then.getLast()) {
                     builder.append(", ");
                 }
             }
