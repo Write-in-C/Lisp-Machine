@@ -53,7 +53,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     public List<Expression> visitIf(IfContext ctx) {
         var builder = new StringBuilder();
         var condPart = ctx.expression(0).list().expressions();
-        var cond = visitExpression(condPart.expression(0)).get(0);
+        var cond = visitExpression(condPart.expression(0)).getFirst();
         var then = visitExpression(ctx.expression(1));
         var els = visitExpression(ctx.expression(2));
         builder.append(cond.value);
