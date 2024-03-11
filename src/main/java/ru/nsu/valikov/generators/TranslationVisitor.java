@@ -150,7 +150,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         visitIdent(ctx.ident());
         visitIdents(ctx.idents());
         var exprs = visitExpressions(ctx.expressions());
-        var returnType = exprs.get(exprs.size() - 1).type;
+        var returnType = exprs.getLast().type;
         String type = "";
         if (returnType == TYPE.INT) {
             type = "int";
