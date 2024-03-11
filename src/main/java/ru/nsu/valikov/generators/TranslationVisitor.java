@@ -59,8 +59,8 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         builder.append(cond.value);
         builder.append("(");
         //2-arity function
-        builder.append(condPart.expression(1).getText() + ", ");
-        builder.append(condPart.expression(2).getText() + ")");
+        builder.append(condPart.expression(1).getText()).append(", ");
+        builder.append(condPart.expression(2).getText()).append(")");
         builder.append(" ? ");
         //shit
         extracted(then, builder);
