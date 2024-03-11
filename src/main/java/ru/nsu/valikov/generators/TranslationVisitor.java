@@ -23,7 +23,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     StringBuilder mem = new StringBuilder();
     boolean shouldPrint = false;
 
-    private static Map<String, List<String>> functions = new HashMap<>();
+    private static final Map<String, List<String>> functions = new HashMap<>();
 
     @Override
     public List<Expression> visitProgram(ProgramContext ctx) {
