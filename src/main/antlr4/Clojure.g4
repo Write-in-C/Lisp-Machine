@@ -2,14 +2,6 @@ grammar Clojure;
 
 import Lexer;
 
-@members {
-//  MakeGenerator gen;
-//  public MakeParser(TokenStream input, MakeGenerator gen) {
-//  super(input);
-//  this.gen = gen;
-//  }
-}
-
 program : filename expressions EOF;
 
 filename : OP NS IDENT CP;
@@ -17,23 +9,20 @@ filename : OP NS IDENT CP;
 expressions : expression*;
 
 expression
-    : list
-    | call
+    : call
     | atom
     | if
     | defn // for now
+    | list
     ;
 
 list : OP expressions CP;
 
-call : OP ident expressions CP;
+call : OP ident arguments CP;
 
 atom
     : number
     | ident
-//    | defn
-//    | symbol
-//    | keyword
     | boolean
     | nil
 //    | arithmetics
@@ -47,9 +36,34 @@ boolean: BOOLEAN;
 
 nil : NIL;
 
-if : OP IF expression expression expression CP;
+hint
+    : INT_HINT
+    | DOUBLE_HINT
+//    | CHAR_HINT
+//    | STRING_HINT
+    | BOOLEAN_HINT
+    ;
+
+if : OP IF ifBody then else CP;
+
+ifBody: expression;
+
+then: expression;
+
+else: expression;
+
+parameters
+  :
+  (hint ident)*
+  ;
+
+defnID: ident hint;
 
 defn
-    : OP DEFN ident SO idents SC expressions CP;
+    : OP DEFN defnID SO parameters SC body=expressions CP;
 
 idents: ident*;
+
+arguments:
+    (expression)*
+    ;

@@ -18,15 +18,19 @@ public class ClojureParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		NS=1, OP=2, CP=3, SO=4, SC=5, IF=6, DEFN=7, IDENT=8, INT=9, EQ=10, MUL=11, 
-		SUB=12, BOOLEAN=13, NIL=14, WHITESPACE=15;
+		SUB=12, ADD=13, BOOLEAN=14, NIL=15, WHITESPACE=16, INT_HINT=17, DOUBLE_HINT=18, 
+		BOOLEAN_HINT=19;
 	public static final int
 		RULE_program = 0, RULE_filename = 1, RULE_expressions = 2, RULE_expression = 3, 
 		RULE_list = 4, RULE_call = 5, RULE_atom = 6, RULE_number = 7, RULE_ident = 8, 
-		RULE_boolean = 9, RULE_nil = 10, RULE_if = 11, RULE_defn = 12, RULE_idents = 13;
+		RULE_boolean = 9, RULE_nil = 10, RULE_hint = 11, RULE_if = 12, RULE_ifBody = 13, 
+		RULE_then = 14, RULE_else = 15, RULE_parameters = 16, RULE_defnID = 17, 
+		RULE_defn = 18, RULE_idents = 19, RULE_arguments = 20;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"program", "filename", "expressions", "expression", "list", "call", "atom", 
-			"number", "ident", "boolean", "nil", "if", "defn", "idents"
+			"number", "ident", "boolean", "nil", "hint", "if", "ifBody", "then", 
+			"else", "parameters", "defnID", "defn", "idents", "arguments"
 		};
 	}
 	public static final String[] ruleNames = makeRuleNames();
@@ -34,14 +38,15 @@ public class ClojureParser extends Parser {
 	private static String[] makeLiteralNames() {
 		return new String[] {
 			null, "'ns'", "'('", "')'", "'['", "']'", "'if'", "'defn'", null, null, 
-			"'='", "'*'", "'-'", null, "'nil'"
+			"'='", "'*'", "'-'", "'+'", null, "'nil'"
 		};
 	}
 	private static final String[] _LITERAL_NAMES = makeLiteralNames();
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, "NS", "OP", "CP", "SO", "SC", "IF", "DEFN", "IDENT", "INT", "EQ", 
-			"MUL", "SUB", "BOOLEAN", "NIL", "WHITESPACE"
+			"MUL", "SUB", "ADD", "BOOLEAN", "NIL", "WHITESPACE", "INT_HINT", "DOUBLE_HINT", 
+			"BOOLEAN_HINT"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -90,13 +95,6 @@ public class ClojureParser extends Parser {
 	@Override
 	public ATN getATN() { return _ATN; }
 
-
-	//  MakeGenerator gen;
-	//  public MakeParser(TokenStream input, MakeGenerator gen) {
-	//  super(input);
-	//  this.gen = gen;
-	//  }
-
 	public ClojureParser(TokenStream input) {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
@@ -128,11 +126,11 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(28);
+			setState(42);
 			filename();
-			setState(29);
+			setState(43);
 			expressions();
-			setState(30);
+			setState(44);
 			match(EOF);
 			}
 		}
@@ -170,13 +168,13 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(32);
+			setState(46);
 			match(OP);
-			setState(33);
+			setState(47);
 			match(NS);
-			setState(34);
+			setState(48);
 			match(IDENT);
-			setState(35);
+			setState(49);
 			match(CP);
 			}
 		}
@@ -217,17 +215,17 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(40);
+			setState(54);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 25348L) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 49924L) != 0)) {
 				{
 				{
-				setState(37);
+				setState(51);
 				expression();
 				}
 				}
-				setState(42);
+				setState(56);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -246,9 +244,6 @@ public class ClojureParser extends Parser {
 
 	@SuppressWarnings("CheckReturnValue")
 	public static class ExpressionContext extends ParserRuleContext {
-		public ListContext list() {
-			return getRuleContext(ListContext.class,0);
-		}
 		public CallContext call() {
 			return getRuleContext(CallContext.class,0);
 		}
@@ -260,6 +255,9 @@ public class ClojureParser extends Parser {
 		}
 		public DefnContext defn() {
 			return getRuleContext(DefnContext.class,0);
+		}
+		public ListContext list() {
+			return getRuleContext(ListContext.class,0);
 		}
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -276,42 +274,42 @@ public class ClojureParser extends Parser {
 		ExpressionContext _localctx = new ExpressionContext(_ctx, getState());
 		enterRule(_localctx, 6, RULE_expression);
 		try {
-			setState(48);
+			setState(62);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,1,_ctx) ) {
 			case 1:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(43);
-				list();
+				setState(57);
+				call();
 				}
 				break;
 			case 2:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(44);
-				call();
+				setState(58);
+				atom();
 				}
 				break;
 			case 3:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(45);
-				atom();
+				setState(59);
+				if_();
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(46);
-				if_();
+				setState(60);
+				defn();
 				}
 				break;
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
-				setState(47);
-				defn();
+				setState(61);
+				list();
 				}
 				break;
 			}
@@ -351,11 +349,11 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(50);
+			setState(64);
 			match(OP);
-			setState(51);
+			setState(65);
 			expressions();
-			setState(52);
+			setState(66);
 			match(CP);
 			}
 		}
@@ -376,8 +374,8 @@ public class ClojureParser extends Parser {
 		public IdentContext ident() {
 			return getRuleContext(IdentContext.class,0);
 		}
-		public ExpressionsContext expressions() {
-			return getRuleContext(ExpressionsContext.class,0);
+		public ArgumentsContext arguments() {
+			return getRuleContext(ArgumentsContext.class,0);
 		}
 		public TerminalNode CP() { return getToken(ClojureParser.CP, 0); }
 		public CallContext(ParserRuleContext parent, int invokingState) {
@@ -397,13 +395,13 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(54);
+			setState(68);
 			match(OP);
-			setState(55);
+			setState(69);
 			ident();
-			setState(56);
-			expressions();
-			setState(57);
+			setState(70);
+			arguments();
+			setState(71);
 			match(CP);
 			}
 		}
@@ -447,34 +445,34 @@ public class ClojureParser extends Parser {
 		AtomContext _localctx = new AtomContext(_ctx, getState());
 		enterRule(_localctx, 12, RULE_atom);
 		try {
-			setState(63);
+			setState(77);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case INT:
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(59);
+				setState(73);
 				number();
 				}
 				break;
 			case IDENT:
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(60);
+				setState(74);
 				ident();
 				}
 				break;
 			case BOOLEAN:
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(61);
+				setState(75);
 				boolean_();
 				}
 				break;
 			case NIL:
 				enterOuterAlt(_localctx, 4);
 				{
-				setState(62);
+				setState(76);
 				nil();
 				}
 				break;
@@ -513,7 +511,7 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(65);
+			setState(79);
 			match(INT);
 			}
 		}
@@ -548,7 +546,7 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(67);
+			setState(81);
 			match(IDENT);
 			}
 		}
@@ -583,7 +581,7 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(69);
+			setState(83);
 			match(BOOLEAN);
 			}
 		}
@@ -618,8 +616,54 @@ public class ClojureParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(71);
+			setState(85);
 			match(NIL);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class HintContext extends ParserRuleContext {
+		public TerminalNode INT_HINT() { return getToken(ClojureParser.INT_HINT, 0); }
+		public TerminalNode DOUBLE_HINT() { return getToken(ClojureParser.DOUBLE_HINT, 0); }
+		public TerminalNode BOOLEAN_HINT() { return getToken(ClojureParser.BOOLEAN_HINT, 0); }
+		public HintContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_hint; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ClojureVisitor ) return ((ClojureVisitor<? extends T>)visitor).visitHint(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final HintContext hint() throws RecognitionException {
+		HintContext _localctx = new HintContext(_ctx, getState());
+		enterRule(_localctx, 22, RULE_hint);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(87);
+			_la = _input.LA(1);
+			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & 917504L) != 0)) ) {
+			_errHandler.recoverInline(this);
+			}
+			else {
+				if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+				_errHandler.reportMatch(this);
+				consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -637,11 +681,14 @@ public class ClojureParser extends Parser {
 	public static class IfContext extends ParserRuleContext {
 		public TerminalNode OP() { return getToken(ClojureParser.OP, 0); }
 		public TerminalNode IF() { return getToken(ClojureParser.IF, 0); }
-		public List<ExpressionContext> expression() {
-			return getRuleContexts(ExpressionContext.class);
+		public IfBodyContext ifBody() {
+			return getRuleContext(IfBodyContext.class,0);
 		}
-		public ExpressionContext expression(int i) {
-			return getRuleContext(ExpressionContext.class,i);
+		public ThenContext then() {
+			return getRuleContext(ThenContext.class,0);
+		}
+		public ElseContext else_() {
+			return getRuleContext(ElseContext.class,0);
 		}
 		public TerminalNode CP() { return getToken(ClojureParser.CP, 0); }
 		public IfContext(ParserRuleContext parent, int invokingState) {
@@ -657,21 +704,21 @@ public class ClojureParser extends Parser {
 
 	public final IfContext if_() throws RecognitionException {
 		IfContext _localctx = new IfContext(_ctx, getState());
-		enterRule(_localctx, 22, RULE_if);
+		enterRule(_localctx, 24, RULE_if);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(73);
+			setState(89);
 			match(OP);
-			setState(74);
+			setState(90);
 			match(IF);
-			setState(75);
-			expression();
-			setState(76);
-			expression();
-			setState(77);
-			expression();
-			setState(78);
+			setState(91);
+			ifBody();
+			setState(92);
+			then();
+			setState(93);
+			else_();
+			setState(94);
 			match(CP);
 			}
 		}
@@ -687,21 +734,236 @@ public class ClojureParser extends Parser {
 	}
 
 	@SuppressWarnings("CheckReturnValue")
-	public static class DefnContext extends ParserRuleContext {
-		public TerminalNode OP() { return getToken(ClojureParser.OP, 0); }
-		public TerminalNode DEFN() { return getToken(ClojureParser.DEFN, 0); }
+	public static class IfBodyContext extends ParserRuleContext {
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public IfBodyContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_ifBody; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ClojureVisitor ) return ((ClojureVisitor<? extends T>)visitor).visitIfBody(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final IfBodyContext ifBody() throws RecognitionException {
+		IfBodyContext _localctx = new IfBodyContext(_ctx, getState());
+		enterRule(_localctx, 26, RULE_ifBody);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(96);
+			expression();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class ThenContext extends ParserRuleContext {
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public ThenContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_then; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ClojureVisitor ) return ((ClojureVisitor<? extends T>)visitor).visitThen(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final ThenContext then() throws RecognitionException {
+		ThenContext _localctx = new ThenContext(_ctx, getState());
+		enterRule(_localctx, 28, RULE_then);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(98);
+			expression();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class ElseContext extends ParserRuleContext {
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
+		}
+		public ElseContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_else; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ClojureVisitor ) return ((ClojureVisitor<? extends T>)visitor).visitElse(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final ElseContext else_() throws RecognitionException {
+		ElseContext _localctx = new ElseContext(_ctx, getState());
+		enterRule(_localctx, 30, RULE_else);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(100);
+			expression();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class ParametersContext extends ParserRuleContext {
+		public List<HintContext> hint() {
+			return getRuleContexts(HintContext.class);
+		}
+		public HintContext hint(int i) {
+			return getRuleContext(HintContext.class,i);
+		}
+		public List<IdentContext> ident() {
+			return getRuleContexts(IdentContext.class);
+		}
+		public IdentContext ident(int i) {
+			return getRuleContext(IdentContext.class,i);
+		}
+		public ParametersContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_parameters; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ClojureVisitor ) return ((ClojureVisitor<? extends T>)visitor).visitParameters(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final ParametersContext parameters() throws RecognitionException {
+		ParametersContext _localctx = new ParametersContext(_ctx, getState());
+		enterRule(_localctx, 32, RULE_parameters);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(107);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 917504L) != 0)) {
+				{
+				{
+				setState(102);
+				hint();
+				setState(103);
+				ident();
+				}
+				}
+				setState(109);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class DefnIDContext extends ParserRuleContext {
 		public IdentContext ident() {
 			return getRuleContext(IdentContext.class,0);
 		}
+		public HintContext hint() {
+			return getRuleContext(HintContext.class,0);
+		}
+		public DefnIDContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_defnID; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ClojureVisitor ) return ((ClojureVisitor<? extends T>)visitor).visitDefnID(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final DefnIDContext defnID() throws RecognitionException {
+		DefnIDContext _localctx = new DefnIDContext(_ctx, getState());
+		enterRule(_localctx, 34, RULE_defnID);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(110);
+			ident();
+			setState(111);
+			hint();
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class DefnContext extends ParserRuleContext {
+		public ExpressionsContext body;
+		public TerminalNode OP() { return getToken(ClojureParser.OP, 0); }
+		public TerminalNode DEFN() { return getToken(ClojureParser.DEFN, 0); }
+		public DefnIDContext defnID() {
+			return getRuleContext(DefnIDContext.class,0);
+		}
 		public TerminalNode SO() { return getToken(ClojureParser.SO, 0); }
-		public IdentsContext idents() {
-			return getRuleContext(IdentsContext.class,0);
+		public ParametersContext parameters() {
+			return getRuleContext(ParametersContext.class,0);
 		}
 		public TerminalNode SC() { return getToken(ClojureParser.SC, 0); }
+		public TerminalNode CP() { return getToken(ClojureParser.CP, 0); }
 		public ExpressionsContext expressions() {
 			return getRuleContext(ExpressionsContext.class,0);
 		}
-		public TerminalNode CP() { return getToken(ClojureParser.CP, 0); }
 		public DefnContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
@@ -715,25 +977,25 @@ public class ClojureParser extends Parser {
 
 	public final DefnContext defn() throws RecognitionException {
 		DefnContext _localctx = new DefnContext(_ctx, getState());
-		enterRule(_localctx, 24, RULE_defn);
+		enterRule(_localctx, 36, RULE_defn);
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(80);
+			setState(113);
 			match(OP);
-			setState(81);
+			setState(114);
 			match(DEFN);
-			setState(82);
-			ident();
-			setState(83);
+			setState(115);
+			defnID();
+			setState(116);
 			match(SO);
-			setState(84);
-			idents();
-			setState(85);
+			setState(117);
+			parameters();
+			setState(118);
 			match(SC);
-			setState(86);
-			expressions();
-			setState(87);
+			setState(119);
+			((DefnContext)_localctx).body = expressions();
+			setState(120);
 			match(CP);
 			}
 		}
@@ -769,22 +1031,75 @@ public class ClojureParser extends Parser {
 
 	public final IdentsContext idents() throws RecognitionException {
 		IdentsContext _localctx = new IdentsContext(_ctx, getState());
-		enterRule(_localctx, 26, RULE_idents);
+		enterRule(_localctx, 38, RULE_idents);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(92);
+			setState(125);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==IDENT) {
 				{
 				{
-				setState(89);
+				setState(122);
 				ident();
 				}
 				}
-				setState(94);
+				setState(127);
+				_errHandler.sync(this);
+				_la = _input.LA(1);
+			}
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	@SuppressWarnings("CheckReturnValue")
+	public static class ArgumentsContext extends ParserRuleContext {
+		public List<ExpressionContext> expression() {
+			return getRuleContexts(ExpressionContext.class);
+		}
+		public ExpressionContext expression(int i) {
+			return getRuleContext(ExpressionContext.class,i);
+		}
+		public ArgumentsContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_arguments; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ClojureVisitor ) return ((ClojureVisitor<? extends T>)visitor).visitArguments(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final ArgumentsContext arguments() throws RecognitionException {
+		ArgumentsContext _localctx = new ArgumentsContext(_ctx, getState());
+		enterRule(_localctx, 40, RULE_arguments);
+		int _la;
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(131);
+			_errHandler.sync(this);
+			_la = _input.LA(1);
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 49924L) != 0)) {
+				{
+				{
+				setState(128);
+				expression();
+				}
+				}
+				setState(133);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
@@ -802,56 +1117,77 @@ public class ClojureParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\u0004\u0001\u000f`\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"+
-		"\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"+
-		"\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"+
-		"\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b\u0002"+
-		"\f\u0007\f\u0002\r\u0007\r\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000"+
-		"\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0001\u0002"+
-		"\u0005\u0002\'\b\u0002\n\u0002\f\u0002*\t\u0002\u0001\u0003\u0001\u0003"+
-		"\u0001\u0003\u0001\u0003\u0001\u0003\u0003\u00031\b\u0003\u0001\u0004"+
-		"\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0005\u0001\u0005\u0001\u0005"+
-		"\u0001\u0005\u0001\u0005\u0001\u0006\u0001\u0006\u0001\u0006\u0001\u0006"+
-		"\u0003\u0006@\b\u0006\u0001\u0007\u0001\u0007\u0001\b\u0001\b\u0001\t"+
-		"\u0001\t\u0001\n\u0001\n\u0001\u000b\u0001\u000b\u0001\u000b\u0001\u000b"+
-		"\u0001\u000b\u0001\u000b\u0001\u000b\u0001\f\u0001\f\u0001\f\u0001\f\u0001"+
-		"\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\r\u0005\r[\b\r\n\r\f\r^\t\r\u0001"+
-		"\r\u0000\u0000\u000e\u0000\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014"+
-		"\u0016\u0018\u001a\u0000\u0000Z\u0000\u001c\u0001\u0000\u0000\u0000\u0002"+
-		" \u0001\u0000\u0000\u0000\u0004(\u0001\u0000\u0000\u0000\u00060\u0001"+
-		"\u0000\u0000\u0000\b2\u0001\u0000\u0000\u0000\n6\u0001\u0000\u0000\u0000"+
-		"\f?\u0001\u0000\u0000\u0000\u000eA\u0001\u0000\u0000\u0000\u0010C\u0001"+
-		"\u0000\u0000\u0000\u0012E\u0001\u0000\u0000\u0000\u0014G\u0001\u0000\u0000"+
-		"\u0000\u0016I\u0001\u0000\u0000\u0000\u0018P\u0001\u0000\u0000\u0000\u001a"+
-		"\\\u0001\u0000\u0000\u0000\u001c\u001d\u0003\u0002\u0001\u0000\u001d\u001e"+
-		"\u0003\u0004\u0002\u0000\u001e\u001f\u0005\u0000\u0000\u0001\u001f\u0001"+
-		"\u0001\u0000\u0000\u0000 !\u0005\u0002\u0000\u0000!\"\u0005\u0001\u0000"+
-		"\u0000\"#\u0005\b\u0000\u0000#$\u0005\u0003\u0000\u0000$\u0003\u0001\u0000"+
-		"\u0000\u0000%\'\u0003\u0006\u0003\u0000&%\u0001\u0000\u0000\u0000\'*\u0001"+
-		"\u0000\u0000\u0000(&\u0001\u0000\u0000\u0000()\u0001\u0000\u0000\u0000"+
-		")\u0005\u0001\u0000\u0000\u0000*(\u0001\u0000\u0000\u0000+1\u0003\b\u0004"+
-		"\u0000,1\u0003\n\u0005\u0000-1\u0003\f\u0006\u0000.1\u0003\u0016\u000b"+
-		"\u0000/1\u0003\u0018\f\u00000+\u0001\u0000\u0000\u00000,\u0001\u0000\u0000"+
-		"\u00000-\u0001\u0000\u0000\u00000.\u0001\u0000\u0000\u00000/\u0001\u0000"+
-		"\u0000\u00001\u0007\u0001\u0000\u0000\u000023\u0005\u0002\u0000\u0000"+
-		"34\u0003\u0004\u0002\u000045\u0005\u0003\u0000\u00005\t\u0001\u0000\u0000"+
-		"\u000067\u0005\u0002\u0000\u000078\u0003\u0010\b\u000089\u0003\u0004\u0002"+
-		"\u00009:\u0005\u0003\u0000\u0000:\u000b\u0001\u0000\u0000\u0000;@\u0003"+
-		"\u000e\u0007\u0000<@\u0003\u0010\b\u0000=@\u0003\u0012\t\u0000>@\u0003"+
-		"\u0014\n\u0000?;\u0001\u0000\u0000\u0000?<\u0001\u0000\u0000\u0000?=\u0001"+
-		"\u0000\u0000\u0000?>\u0001\u0000\u0000\u0000@\r\u0001\u0000\u0000\u0000"+
-		"AB\u0005\t\u0000\u0000B\u000f\u0001\u0000\u0000\u0000CD\u0005\b\u0000"+
-		"\u0000D\u0011\u0001\u0000\u0000\u0000EF\u0005\r\u0000\u0000F\u0013\u0001"+
-		"\u0000\u0000\u0000GH\u0005\u000e\u0000\u0000H\u0015\u0001\u0000\u0000"+
-		"\u0000IJ\u0005\u0002\u0000\u0000JK\u0005\u0006\u0000\u0000KL\u0003\u0006"+
-		"\u0003\u0000LM\u0003\u0006\u0003\u0000MN\u0003\u0006\u0003\u0000NO\u0005"+
-		"\u0003\u0000\u0000O\u0017\u0001\u0000\u0000\u0000PQ\u0005\u0002\u0000"+
-		"\u0000QR\u0005\u0007\u0000\u0000RS\u0003\u0010\b\u0000ST\u0005\u0004\u0000"+
-		"\u0000TU\u0003\u001a\r\u0000UV\u0005\u0005\u0000\u0000VW\u0003\u0004\u0002"+
-		"\u0000WX\u0005\u0003\u0000\u0000X\u0019\u0001\u0000\u0000\u0000Y[\u0003"+
-		"\u0010\b\u0000ZY\u0001\u0000\u0000\u0000[^\u0001\u0000\u0000\u0000\\Z"+
-		"\u0001\u0000\u0000\u0000\\]\u0001\u0000\u0000\u0000]\u001b\u0001\u0000"+
-		"\u0000\u0000^\\\u0001\u0000\u0000\u0000\u0004(0?\\";
+		"\u0004\u0001\u0013\u0087\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001"+
+		"\u0002\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004"+
+		"\u0002\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007"+
+		"\u0002\b\u0007\b\u0002\t\u0007\t\u0002\n\u0007\n\u0002\u000b\u0007\u000b"+
+		"\u0002\f\u0007\f\u0002\r\u0007\r\u0002\u000e\u0007\u000e\u0002\u000f\u0007"+
+		"\u000f\u0002\u0010\u0007\u0010\u0002\u0011\u0007\u0011\u0002\u0012\u0007"+
+		"\u0012\u0002\u0013\u0007\u0013\u0002\u0014\u0007\u0014\u0001\u0000\u0001"+
+		"\u0000\u0001\u0000\u0001\u0000\u0001\u0001\u0001\u0001\u0001\u0001\u0001"+
+		"\u0001\u0001\u0001\u0001\u0002\u0005\u00025\b\u0002\n\u0002\f\u00028\t"+
+		"\u0002\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0001\u0003\u0003"+
+		"\u0003?\b\u0003\u0001\u0004\u0001\u0004\u0001\u0004\u0001\u0004\u0001"+
+		"\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0005\u0001\u0006\u0001"+
+		"\u0006\u0001\u0006\u0001\u0006\u0003\u0006N\b\u0006\u0001\u0007\u0001"+
+		"\u0007\u0001\b\u0001\b\u0001\t\u0001\t\u0001\n\u0001\n\u0001\u000b\u0001"+
+		"\u000b\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\f\u0001\r"+
+		"\u0001\r\u0001\u000e\u0001\u000e\u0001\u000f\u0001\u000f\u0001\u0010\u0001"+
+		"\u0010\u0001\u0010\u0005\u0010j\b\u0010\n\u0010\f\u0010m\t\u0010\u0001"+
+		"\u0011\u0001\u0011\u0001\u0011\u0001\u0012\u0001\u0012\u0001\u0012\u0001"+
+		"\u0012\u0001\u0012\u0001\u0012\u0001\u0012\u0001\u0012\u0001\u0012\u0001"+
+		"\u0013\u0005\u0013|\b\u0013\n\u0013\f\u0013\u007f\t\u0013\u0001\u0014"+
+		"\u0005\u0014\u0082\b\u0014\n\u0014\f\u0014\u0085\t\u0014\u0001\u0014\u0000"+
+		"\u0000\u0015\u0000\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016"+
+		"\u0018\u001a\u001c\u001e \"$&(\u0000\u0001\u0001\u0000\u0011\u0013|\u0000"+
+		"*\u0001\u0000\u0000\u0000\u0002.\u0001\u0000\u0000\u0000\u00046\u0001"+
+		"\u0000\u0000\u0000\u0006>\u0001\u0000\u0000\u0000\b@\u0001\u0000\u0000"+
+		"\u0000\nD\u0001\u0000\u0000\u0000\fM\u0001\u0000\u0000\u0000\u000eO\u0001"+
+		"\u0000\u0000\u0000\u0010Q\u0001\u0000\u0000\u0000\u0012S\u0001\u0000\u0000"+
+		"\u0000\u0014U\u0001\u0000\u0000\u0000\u0016W\u0001\u0000\u0000\u0000\u0018"+
+		"Y\u0001\u0000\u0000\u0000\u001a`\u0001\u0000\u0000\u0000\u001cb\u0001"+
+		"\u0000\u0000\u0000\u001ed\u0001\u0000\u0000\u0000 k\u0001\u0000\u0000"+
+		"\u0000\"n\u0001\u0000\u0000\u0000$q\u0001\u0000\u0000\u0000&}\u0001\u0000"+
+		"\u0000\u0000(\u0083\u0001\u0000\u0000\u0000*+\u0003\u0002\u0001\u0000"+
+		"+,\u0003\u0004\u0002\u0000,-\u0005\u0000\u0000\u0001-\u0001\u0001\u0000"+
+		"\u0000\u0000./\u0005\u0002\u0000\u0000/0\u0005\u0001\u0000\u000001\u0005"+
+		"\b\u0000\u000012\u0005\u0003\u0000\u00002\u0003\u0001\u0000\u0000\u0000"+
+		"35\u0003\u0006\u0003\u000043\u0001\u0000\u0000\u000058\u0001\u0000\u0000"+
+		"\u000064\u0001\u0000\u0000\u000067\u0001\u0000\u0000\u00007\u0005\u0001"+
+		"\u0000\u0000\u000086\u0001\u0000\u0000\u00009?\u0003\n\u0005\u0000:?\u0003"+
+		"\f\u0006\u0000;?\u0003\u0018\f\u0000<?\u0003$\u0012\u0000=?\u0003\b\u0004"+
+		"\u0000>9\u0001\u0000\u0000\u0000>:\u0001\u0000\u0000\u0000>;\u0001\u0000"+
+		"\u0000\u0000><\u0001\u0000\u0000\u0000>=\u0001\u0000\u0000\u0000?\u0007"+
+		"\u0001\u0000\u0000\u0000@A\u0005\u0002\u0000\u0000AB\u0003\u0004\u0002"+
+		"\u0000BC\u0005\u0003\u0000\u0000C\t\u0001\u0000\u0000\u0000DE\u0005\u0002"+
+		"\u0000\u0000EF\u0003\u0010\b\u0000FG\u0003(\u0014\u0000GH\u0005\u0003"+
+		"\u0000\u0000H\u000b\u0001\u0000\u0000\u0000IN\u0003\u000e\u0007\u0000"+
+		"JN\u0003\u0010\b\u0000KN\u0003\u0012\t\u0000LN\u0003\u0014\n\u0000MI\u0001"+
+		"\u0000\u0000\u0000MJ\u0001\u0000\u0000\u0000MK\u0001\u0000\u0000\u0000"+
+		"ML\u0001\u0000\u0000\u0000N\r\u0001\u0000\u0000\u0000OP\u0005\t\u0000"+
+		"\u0000P\u000f\u0001\u0000\u0000\u0000QR\u0005\b\u0000\u0000R\u0011\u0001"+
+		"\u0000\u0000\u0000ST\u0005\u000e\u0000\u0000T\u0013\u0001\u0000\u0000"+
+		"\u0000UV\u0005\u000f\u0000\u0000V\u0015\u0001\u0000\u0000\u0000WX\u0007"+
+		"\u0000\u0000\u0000X\u0017\u0001\u0000\u0000\u0000YZ\u0005\u0002\u0000"+
+		"\u0000Z[\u0005\u0006\u0000\u0000[\\\u0003\u001a\r\u0000\\]\u0003\u001c"+
+		"\u000e\u0000]^\u0003\u001e\u000f\u0000^_\u0005\u0003\u0000\u0000_\u0019"+
+		"\u0001\u0000\u0000\u0000`a\u0003\u0006\u0003\u0000a\u001b\u0001\u0000"+
+		"\u0000\u0000bc\u0003\u0006\u0003\u0000c\u001d\u0001\u0000\u0000\u0000"+
+		"de\u0003\u0006\u0003\u0000e\u001f\u0001\u0000\u0000\u0000fg\u0003\u0016"+
+		"\u000b\u0000gh\u0003\u0010\b\u0000hj\u0001\u0000\u0000\u0000if\u0001\u0000"+
+		"\u0000\u0000jm\u0001\u0000\u0000\u0000ki\u0001\u0000\u0000\u0000kl\u0001"+
+		"\u0000\u0000\u0000l!\u0001\u0000\u0000\u0000mk\u0001\u0000\u0000\u0000"+
+		"no\u0003\u0010\b\u0000op\u0003\u0016\u000b\u0000p#\u0001\u0000\u0000\u0000"+
+		"qr\u0005\u0002\u0000\u0000rs\u0005\u0007\u0000\u0000st\u0003\"\u0011\u0000"+
+		"tu\u0005\u0004\u0000\u0000uv\u0003 \u0010\u0000vw\u0005\u0005\u0000\u0000"+
+		"wx\u0003\u0004\u0002\u0000xy\u0005\u0003\u0000\u0000y%\u0001\u0000\u0000"+
+		"\u0000z|\u0003\u0010\b\u0000{z\u0001\u0000\u0000\u0000|\u007f\u0001\u0000"+
+		"\u0000\u0000}{\u0001\u0000\u0000\u0000}~\u0001\u0000\u0000\u0000~\'\u0001"+
+		"\u0000\u0000\u0000\u007f}\u0001\u0000\u0000\u0000\u0080\u0082\u0003\u0006"+
+		"\u0003\u0000\u0081\u0080\u0001\u0000\u0000\u0000\u0082\u0085\u0001\u0000"+
+		"\u0000\u0000\u0083\u0081\u0001\u0000\u0000\u0000\u0083\u0084\u0001\u0000"+
+		"\u0000\u0000\u0084)\u0001\u0000\u0000\u0000\u0085\u0083\u0001\u0000\u0000"+
+		"\u0000\u00066>Mk}\u0083";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {
