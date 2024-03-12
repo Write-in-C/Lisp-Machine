@@ -1,5 +1,5 @@
 (ns factorial)
-(defn factorial [n] // можно писать аннотации для типов, типо хинтов [^int n]
+(defn factorial ^Integer [^Integer n]
       (if (= n 0)
         1
         (* n (factorial (- n 1)))))
