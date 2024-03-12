@@ -23,7 +23,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     StringBuilder mem = new StringBuilder();
     boolean shouldPrint = false;
 
-    private static Map<String, List<String>> functions = new HashMap<>();
+    private static final Map<String, List<String>> functions = new HashMap<>();
 
     @Override
     public List<Expression> visitProgram(ProgramContext ctx) {
@@ -36,13 +36,15 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
                 mem.append(buffer, 0, read);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("unable to read file");
+            System.err.println(e.getMessage());
         }
         super.visitProgram(ctx);
         try (var writer = new PrintWriter(file)) {
             writer.println(mem);
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("unable to write file");
+            System.err.println(e.getMessage());
         }
         return null;
     }
@@ -51,14 +53,14 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     public List<Expression> visitIf(IfContext ctx) {
         var builder = new StringBuilder();
         var condPart = ctx.expression(0).list().expressions();
-        var cond = visitExpression(condPart.expression(0)).get(0);
+        var cond = visitExpression(condPart.expression(0)).getFirst();
         var then = visitExpression(ctx.expression(1));
         var els = visitExpression(ctx.expression(2));
         builder.append(cond.value);
         builder.append("(");
         //2-arity function
-        builder.append(condPart.expression(1).getText() + ", ");
-        builder.append(condPart.expression(2).getText() + ")");
+        builder.append(condPart.expression(1).getText()).append(", ");
+        builder.append(condPart.expression(2).getText()).append(")");
         builder.append(" ? ");
         //shit
         extracted(then, builder);
@@ -68,7 +70,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             mem.append(builder);
         }
 //        System.out.println(then.get(then.size() - 1).type);
-        return List.of(then.get(then.size() - 1));
+        return List.of(then.getLast());
     }
 
     private static void extracted(List<Expression> then, StringBuilder builder) {
@@ -81,7 +83,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
                 builder.append(i.value).append("(");
             } else {
                 builder.append(i.value);
-                if (c > 0 && i != then.get(then.size() - 1)) {
+                if (c > 0 && i != then.getLast()) {
                     builder.append(", ");
                 }
             }
@@ -148,7 +150,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         visitIdent(ctx.ident());
         visitIdents(ctx.idents());
         var exprs = visitExpressions(ctx.expressions());
-        var returnType = exprs.get(exprs.size() - 1).type;
+        var returnType = exprs.getLast().type;
         String type = "";
         if (returnType == TYPE.INT) {
             type = "int";

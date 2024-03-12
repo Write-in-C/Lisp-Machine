@@ -23,7 +23,7 @@ public class Expression {
         FUNCTION,
         BOOLEAN,
         LIST,
-        NONE; // not inferred
+        NONE // not inferred
     }
 
     public static String defaultValue(TYPE type) {
