@@ -11,11 +11,10 @@ public class Main {
 
     public static void main(String[] args) {
         String expression = """
-            (ns factorial)
-            (defn factorial [n]
-                  (if (= n 0)
-                    1
-                    (* n (factorial (- n 1)))))""";
+            (ns sum)
+            (defn sum ^Integer [^Integer a ^Integer b]
+                 (+ a b))
+            """;
         ClojureLexer lexer = new ClojureLexer(CharStreams.fromString(expression));
         ClojureParser parser = new ClojureParser(new CommonTokenStream(lexer));
         ParseTree tree = parser.program();
