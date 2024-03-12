@@ -1,11 +1,7 @@
 #include <stdlib.h>
-
+#include <stdio.h>
 
 int lisp_add_int(int a, int b) {
-    return a + b;
-}
-
-double lisp_add_int(double a, double b) {
     return a + b;
 }
 
@@ -29,7 +25,7 @@ int lisp_eq_int(int a, int b) {
     return a == b;
 }
 
-int factorial(int n) {
-    return lisp_eq_int(n, 0) ? 1 : lisp_mul_int(n, factorial(lisp_sub_int(n, 1)));
+int sum(int a, int b) {
+    return lisp_add_int(a, b);
 }
 
