@@ -77,11 +77,47 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitNil(ClojureParser.NilContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ClojureParser#hint}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHint(ClojureParser.HintContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ClojureParser#if}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitIf(ClojureParser.IfContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#ifBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfBody(ClojureParser.IfBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#then}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitThen(ClojureParser.ThenContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#else}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitElse(ClojureParser.ElseContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#parameters}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameters(ClojureParser.ParametersContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#defnID}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDefnID(ClojureParser.DefnIDContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ClojureParser#defn}.
 	 * @param ctx the parse tree
@@ -94,4 +130,10 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitIdents(ClojureParser.IdentsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#arguments}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitArguments(ClojureParser.ArgumentsContext ctx);
 }

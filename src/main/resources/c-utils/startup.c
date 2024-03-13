@@ -1,47 +1,27 @@
 #include <stdlib.h>
+#include <stdio.h>
 
-typedef enum {
-    INT,
-    LONG,
-    FLOAT,
-    DOUBLE,
-    CHAR,
-    POINTER
-    //...
-} ValueType;
-
-
-typedef struct {
-    ValueType type;
-    void *value;
-} ClojureValue;
-
-ClojureValue lisp_add(ClojureValue a, ClojureValue b) {
-    // some exception needs to be thrown
-    if (a.type != INT || b.type != INT) exit(1);
-    a.value = (void *) ((int) a.value + (int) b.value);
-    return a;
+int lisp_add_int(int a, int b) {
+    return a + b;
 }
 
-ClojureValue lisp_neg(ClojureValue a) {
-    if (a.type != INT) exit(1);
-    a.value = (void *) -(int) a.value;
-    return a;
+int lisp_neg_int(int a) {
+    return -a;
 }
 
-ClojureValue lisp_sub(ClojureValue a, ClojureValue b) {
-    if (a.type != INT || b.type != INT) exit(1);
-    return lisp_add(a, lisp_neg(b));
+int lisp_sub_int(int a, int b) {
+    return a - b;
 }
 
-ClojureValue lisp_mul(ClojureValue a, ClojureValue b) {
-    if (a.type != INT || b.type != INT)exit(1);
-    a.value = (void *) ((int) a.value * (int) b.value);
-    return a;
+int lisp_mul_int(int a, int b) {
+    return a * b;
 }
 
-ClojureValue lisp_div(ClojureValue a, ClojureValue b) {
-    if (a.type != INT || b.type != INT) exit(1);
-    a.value = (void *) ((int) a.value / (int) b.value);
-    return a;
+int lisp_div_int(int a, int b) {
+    return a / b;
 }
+
+int lisp_eq_int(int a, int b) {
+    return a == b;
+}
+

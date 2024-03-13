@@ -18,7 +18,7 @@ IF : 'if';
 
 DEFN : 'defn';
 
-IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB;
+IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB | ADD;
 
 //EXTENDED_STRING
 //    : (SYMBOLS | LETTER | DIGIT)+;
@@ -33,6 +33,8 @@ MUL: '*';
 
 SUB: '-';
 
+ADD: '+';
+
 BOOLEAN
     : 'true'
     | 'false';
@@ -40,6 +42,16 @@ BOOLEAN
 NIL : 'nil';
 
 WHITESPACE : [ \r\n\t] + -> skip;
+
+// hints
+
+INT_HINT : HINT_HEAD 'Integer';
+
+DOUBLE_HINT : HINT_HEAD 'double';
+
+BOOLEAN_HINT : HINT_HEAD 'Boolean';
+
+fragment HINT_HEAD: '^';
 
 fragment DIGIT  :  [0-9];
 

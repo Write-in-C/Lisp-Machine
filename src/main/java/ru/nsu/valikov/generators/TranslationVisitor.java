@@ -1,10 +1,14 @@
 package ru.nsu.valikov.generators;
 
 import antlr.ClojureBaseVisitor;
+import antlr.ClojureParser.ArgumentsContext;
+import antlr.ClojureParser.CallContext;
 import antlr.ClojureParser.DefnContext;
+import antlr.ClojureParser.DefnIDContext;
 import antlr.ClojureParser.ExpressionContext;
 import antlr.ClojureParser.ExpressionsContext;
 import antlr.ClojureParser.IfContext;
+import antlr.ClojureParser.ParametersContext;
 import antlr.ClojureParser.ProgramContext;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 import ru.nsu.valikov.compiler.Scopes;
 import ru.nsu.valikov.generators.Expression.TYPE;
+import ru.nsu.valikov.generators.Expression.TYPE.FUNCTION_TYPE;
 
 public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
@@ -23,10 +28,30 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     StringBuilder mem = new StringBuilder();
     boolean shouldPrint = false;
 
-    private static final Map<String, List<String>> functions = new HashMap<>();
+    private static final Map<String, List<Expression>> functions = new HashMap<>();
+
+    static {
+        Scopes.createNew();
+        Scopes.defineNewVariable("lisp_eq_int",
+            new Expression(TYPE.FUNCTION, "lisp_eq_int", FUNCTION_TYPE.BOOLEAN));
+        Scopes.defineNewVariable("lisp_mul_int",
+            new Expression(TYPE.FUNCTION, "lisp_mul_int", FUNCTION_TYPE.INT));
+        Scopes.defineNewVariable("lisp_div_int",
+            new Expression(TYPE.FUNCTION, "lisp_div_int", FUNCTION_TYPE.INT));
+        Scopes.defineNewVariable("lisp_sub_int",
+            new Expression(TYPE.FUNCTION, "lisp_sub_int", FUNCTION_TYPE.INT));
+        Scopes.defineNewVariable("lisp_add_int",
+            new Expression(TYPE.FUNCTION, "lisp_add_int", FUNCTION_TYPE.INT));
+        functions.put("lisp_eq_int", List.of());
+        functions.put("lisp_mul_int", List.of());
+        functions.put("lisp_div_int", List.of());
+        functions.put("lisp_sub_int", List.of());
+        functions.put("lisp_add_int", List.of());
+    }
 
     @Override
     public List<Expression> visitProgram(ProgramContext ctx) {
+
         file = "out/" + ctx.filename().IDENT().getText() + ".c";
         try (InputStreamReader stream = new InputStreamReader(
             Objects.requireNonNull(getClass().getResourceAsStream("/c-utils/startup.c")))) {
@@ -46,51 +71,112 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             System.err.println("unable to write file");
             System.err.println(e.getMessage());
         }
+
         return null;
     }
 
     @Override
     public List<Expression> visitIf(IfContext ctx) {
-        var builder = new StringBuilder();
-        var condPart = ctx.expression(0).list().expressions();
-        var cond = visitExpression(condPart.expression(0)).getFirst();
-        var then = visitExpression(ctx.expression(1));
-        var els = visitExpression(ctx.expression(2));
-        builder.append(cond.value);
-        builder.append("(");
-        //2-arity function
-        builder.append(condPart.expression(1).getText()).append(", ");
-        builder.append(condPart.expression(2).getText()).append(")");
-        builder.append(" ? ");
-        //shit
-        extracted(then, builder);
-        builder.append(" : ");
-        extracted(els, builder);
-        if (shouldPrint) {
-            mem.append(builder);
+        Scopes.createNew();
+
+        visitIfBody(ctx.ifBody());
+        mem.append(" ? ");
+
+        var then = visitThen(ctx.then());
+        var last=then.getLast();
+        if (last.type != TYPE.FUNCTION) {
+            mem.append(last.value);
         }
-//        System.out.println(then.get(then.size() - 1).type);
-        return List.of(then.getLast());
+        mem.append(" : ");
+
+        var els = visitElse(ctx.else_());
+        last=els.getLast();
+        if (last.type != TYPE.FUNCTION) {
+            mem.append(last.value);
+        }
+
+        Scopes.deleteLast();
+        return List.of(last);
     }
 
-    private static void extracted(List<Expression> then, StringBuilder builder) {
+    List<Integer> recursionCallDepth = new ArrayList<>();
 
-        var c = 0;
-        for (var i : then) {
-//            System.out.println(i.type + " " + i.value);
-            if (i.type == TYPE.FUNCTION) {
-                c++;
-                builder.append(i.value).append("(");
-            } else {
-                builder.append(i.value);
-                if (c > 0 && i != then.getLast()) {
-                    builder.append(", ");
+    @Override
+    public List<Expression> visitCall(CallContext ctx) {
+        var n = recursionCallDepth.size() - 1;
+        recursionCallDepth.set(n, recursionCallDepth.get(n) + 1);
+        var arguments = visitArguments(ctx.arguments());
+        var defaultPrefix = "";
+        var defaultType = FUNCTION_TYPE.NOT_A_FUNCTION;
+        if (arguments.stream()
+            .allMatch(i -> i.type == TYPE.INT || i.functionType == FUNCTION_TYPE.INT)) {
+            defaultPrefix = "_int";
+            defaultType = FUNCTION_TYPE.INT;
+        }
+
+        var fName = ctx.ident().getText();
+        var buffer = new StringBuilder();
+
+        switch (fName) {
+            case "=" -> {
+                fName = "lisp_eq%s".formatted(defaultPrefix);
+                buffer.append(fName);
+//                yield List.of(new Expression(TYPE.FUNCTION, fName,
+//                    FUNCTION_TYPE.BOOLEAN));
+            }
+            case "-" -> {
+                fName = "lisp_sub%s".formatted(defaultPrefix);
+                buffer.append(fName);
+//                yield List.of(new Expression(TYPE.FUNCTION, fName,
+//                    defaultType));
+            }
+            case "+" -> {
+                fName = "lisp_add%s".formatted(defaultPrefix);
+                buffer.append(fName);
+//                yield List.of(new Expression(TYPE.FUNCTION, fName,
+//                    defaultType));
+            }
+            case "*" -> {
+                fName = "lisp_mul%s".formatted(defaultPrefix);
+                buffer.append(fName);
+//                yield List.of(new Expression(TYPE.FUNCTION, fName,
+//                    defaultType));
+            }
+            case "/" -> {
+                fName = "lisp_div%s".formatted(defaultPrefix);
+                buffer.append(fName);
+//                yield List.of(new Expression(TYPE.FUNCTION, fName,
+//                    defaultType));
+            }
+            default -> {
+                if (functions.containsKey(fName)) {
+                    buffer.append(fName);
+                    break;
+//                    yield List.of(
+//                        new Expression(TYPE.FUNCTION, fName, Scopes.get(fName).functionType));
                 }
+
+                throw new RuntimeException("Should not reach here: " + ctx.ident().getText());
             }
         }
-        while (c-- > 0) {
-            builder.append(")");
+
+        buffer.append("(");
+        for (int i = 0; i < arguments.size(); i++) {
+            if (i > 0) {
+                buffer.append(", ");
+            }
+            buffer.append(arguments.get(i).buffer);
         }
+        buffer.append(")");
+
+        var response = Scopes.get(fName);
+        response.buffer = buffer;
+        recursionCallDepth.set(n, recursionCallDepth.get(n) - 1);
+        if (recursionCallDepth.get(n) == 0) {
+            mem.append(buffer);
+            recursionCallDepth.remove(n);
+        }
+        return List.of(response);
     }
 
     @Override
@@ -103,71 +189,93 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
     @Override
     public List<Expression> visitExpression(ExpressionContext ctx) {
-        // костыль на костыле
-        // it must be recursive
+
+        if (ctx.call() != null) {
+            if (recursionCallDepth.isEmpty()) {
+                recursionCallDepth.add(0);
+            }
+            return visitCall(ctx.call());
+        }
+
         if (ctx.atom() != null) {
             if (ctx.atom().number() != null) {
-                return List.of(new Expression(Expression.TYPE.INT,
-                    ctx.atom().number().getText()));
+                var r = new Expression(Expression.TYPE.INT,
+                    ctx.atom().number().getText());
+                r.buffer.append(ctx.atom().getText());
+                return List.of(r);
             }
             if (ctx.atom().ident() != null) {
-                if (ctx.atom().ident().getText().equals("=")) {
-                    return List.of(new Expression(TYPE.FUNCTION, "lisp_eq"));
-                }
-                if (ctx.atom().ident().getText().equals("-")) {
-//                    System.out.println("fsdf");
-                    return List.of(new Expression(TYPE.FUNCTION, "lisp_sub"));
-                }
-                if (ctx.atom().ident().getText().equals("*")) {
-                    return List.of(new Expression(TYPE.FUNCTION, "lisp_mul"));
-                }
-                if (functions.containsKey("lisp_" + ctx.getText())) {
-                    return List.of(new Expression(TYPE.FUNCTION, ctx.getText()));
-                }
-                Scopes.defineNewVariable(ctx.getText(), new Expression(TYPE.NONE));
-                return List.of(new Expression(TYPE.NONE, ctx.getText()));
+                var r = Scopes.get(ctx.atom().ident().getText());
+                return List.of(r);
             }
-            // NONE only for now
-            Scopes.defineNewVariable(ctx.atom().getText(), new Expression(TYPE.NONE));
             return visitAtom(ctx.atom());
         }
-        if (ctx.list() != null && ctx.list().expressions() != null) {
-            return visitExpressions(ctx.list().expressions());
+        if (ctx.list() != null) {
+            return visitList(ctx.list());
         }
         if (ctx.if_() != null) {
             return visitIf(ctx.if_());
         }
-        super.visitExpression(ctx);
-        return List.of(new Expression(Expression.TYPE.NONE, ""));
+        if (ctx.defn() != null) {
+            visitDefn(ctx.defn());
+        }
+
+        return List.of(new Expression(TYPE.NONE, ""));
+    }
+
+    @Override
+    public List<Expression> visitParameters(ParametersContext ctx) {
+        List<Expression> argTypes = new ArrayList<>();
+        mem.append("(");
+
+        for (int i = 0; i < ctx.hint().size(); i++) {
+            if (i > 0) {
+                mem.append(", ");
+            }
+            var argName = ctx.ident(i).getText();
+            var argType = Expression.exprByHint(ctx.hint(i).getText(), false);
+            argType.buffer.append(argName);
+            Scopes.defineNewVariable(argName, argType);
+            argTypes.add(argType);
+            mem.append(argType.getFunctionType()).append(" ")
+                .append(argName);
+        }
+
+        mem.append(")");
+
+        return argTypes;
+    }
+
+    @Override
+    public List<Expression> visitDefnID(DefnIDContext ctx) {
+        var name = ctx.ident().getText();
+        functions.put(name, List.of());
+
+        var funcExpr = Expression.exprByHint(ctx.hint().getText(), true);
+        Scopes.defineNewVariable(name, funcExpr);
+
+        mem.append(funcExpr.getFunctionType()).append(" ")
+            .append(name);
+
+        return List.of(funcExpr);
+    }
+
+    @Override
+    public List<Expression> visitArguments(ArgumentsContext ctx) {
+        List<Expression> list = new ArrayList<>();
+        ctx.expression()
+            .forEach(exp -> list.addAll(visitExpression(exp)));
+        return list;
     }
 
     @Override
     public List<Expression> visitDefn(DefnContext ctx) {
         Scopes.createNew();
 
-        var name = "lisp_" + ctx.ident().getText();
-        functions.put(name, List.of());
-        visitIdent(ctx.ident());
-        visitIdents(ctx.idents());
-        var exprs = visitExpressions(ctx.expressions());
-        var returnType = exprs.getLast().type;
-        String type = "";
-        if (returnType == TYPE.INT) {
-            type = "int";
-        }
-//        var returnType = "lisp_defn_" + name + "_type";
-        mem.append(type).append(" ")
-            .append(name).append("(");
-        for (int i = 0; i < ctx.idents().ident().size(); i++) {
-            if (i > 0) {
-                mem.append(", ");
-            }
-            var argName = ctx.idents().ident(i).getText();
-            var argType = Scopes.getType(argName);
-            mem.append(argType).append(" ")
-                .append(argName);
-        }
-        mem.append(") {\nreturn ");
+        visitDefnID(ctx.defnID());
+        visitParameters(ctx.parameters());
+
+        mem.append(" {\n    return ");
         shouldPrint = true;
         visitExpressions(ctx.expressions());
         mem.append(";");

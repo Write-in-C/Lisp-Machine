@@ -3,6 +3,7 @@ package ru.nsu.valikov.compiler;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import ru.nsu.valikov.generators.Expression;
 import ru.nsu.valikov.generators.Expression.TYPE;
@@ -82,5 +83,13 @@ public class Scopes {
             }
         }
         throw new AssertionError("Should not reach here");
+    }
+
+    public Expression get(String name){
+        return scopes.stream()
+            .map(i -> i.get(name))
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElseThrow(() -> new RuntimeException("No variable with such name: %s".formatted(name)));
     }
 }
