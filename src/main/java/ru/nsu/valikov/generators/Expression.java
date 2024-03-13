@@ -4,8 +4,6 @@ import ru.nsu.valikov.generators.Expression.TYPE.FUNCTION_TYPE;
 
 public class Expression {
 
-    // all translation must be in separate module
-
     public final TYPE type;
     public FUNCTION_TYPE functionType = FUNCTION_TYPE.NOT_A_FUNCTION;
     public final String value;
@@ -76,7 +74,7 @@ public class Expression {
         if (isFunction) {
             return new Expression(TYPE.FUNCTION, switch (hint) {
                 case "Integer" -> FUNCTION_TYPE.INT;
-                case "double" -> FUNCTION_TYPE.DOUBLE;
+                case "Double" -> FUNCTION_TYPE.DOUBLE;
                 case "Boolean" -> FUNCTION_TYPE.BOOLEAN;
 //                case "void" -> FUNCTION_TYPE.VOID;
                 default -> throw new IllegalStateException("should not reach here:" + hint);
@@ -84,10 +82,8 @@ public class Expression {
         }
         return switch (hint) {
             case "Integer" -> new Expression(TYPE.INT);
-            case "double" -> new Expression(TYPE.DOUBLE);
+            case "Double" -> new Expression(TYPE.DOUBLE);
             case "Boolean" -> new Expression(TYPE.BOOLEAN);
-//            case "void" ->
-//                new Expression(TYPE.FUNCTION, FUNCTION_TYPE.VOID); // should not reach here too
             default -> throw new IllegalStateException("should not reach here:" + hint);
         };
     }

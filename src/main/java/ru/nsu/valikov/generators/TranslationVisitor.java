@@ -7,11 +7,9 @@ import antlr.ClojureParser.DefnContext;
 import antlr.ClojureParser.DefnIDContext;
 import antlr.ClojureParser.ExpressionContext;
 import antlr.ClojureParser.ExpressionsContext;
-import antlr.ClojureParser.IfBodyContext;
 import antlr.ClojureParser.IfContext;
 import antlr.ClojureParser.ParametersContext;
 import antlr.ClojureParser.ProgramContext;
-import antlr.ClojureParser.ThenContext;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -53,7 +51,6 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
     @Override
     public List<Expression> visitProgram(ProgramContext ctx) {
-//        Scopes.createNew();
 
         file = "out/" + ctx.filename().IDENT().getText() + ".c";
         try (InputStreamReader stream = new InputStreamReader(
@@ -75,50 +72,31 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             System.err.println(e.getMessage());
         }
 
-//        Scopes.deleteLast();
         return null;
-    }
-
-    @Override
-    public List<Expression> visitIfBody(IfBodyContext ctx) {
-        var exprs = super.visitIfBody(ctx);
-//        mem.append(exprs.get(0).value);
-        return exprs;
-    }
-
-    @Override
-    public List<Expression> visitThen(ThenContext ctx) {
-        return super.visitThen(ctx);
     }
 
     @Override
     public List<Expression> visitIf(IfContext ctx) {
         Scopes.createNew();
 
-        var builder = new StringBuilder();
-//        var condPart = ctx.body.list().expressions();
         visitIfBody(ctx.ifBody());
-//        builder.append(cond.value);
-//        builder.append("(");
-        //2-arity function
-//        builder.append(ctx.expression(1).getText()).append(", ");
-//        builder.append(condPart.expression(2).getText()).append(")");
         mem.append(" ? ");
-        //shit
-        var then = visitThen(ctx.then());
-        if (then.get(then.size() - 1).type != TYPE.FUNCTION) {
-            mem.append(then.get(then.size() - 1).value);
-        }
-//        extracted(then, builder);
-        mem.append(" : ");
-        var els = visitElse(ctx.else_());
 
-        if (els.get(els.size() - 1).type != TYPE.FUNCTION) {
-            mem.append(els.get(then.size() - 1).value);
+        var then = visitThen(ctx.then());
+        var last=then.getLast();
+        if (last.type != TYPE.FUNCTION) {
+            mem.append(last.value);
+        }
+        mem.append(" : ");
+
+        var els = visitElse(ctx.else_());
+        last=els.getLast();
+        if (last.type != TYPE.FUNCTION) {
+            mem.append(last.value);
         }
 
         Scopes.deleteLast();
-        return List.of(then.get(then.size() - 1));
+        return List.of(last);
     }
 
     List<Integer> recursionCallDepth = new ArrayList<>();
@@ -181,43 +159,24 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
                 throw new RuntimeException("Should not reach here: " + ctx.ident().getText());
             }
         }
+
         buffer.append("(");
         for (int i = 0; i < arguments.size(); i++) {
             if (i > 0) {
                 buffer.append(", ");
             }
-//            System.out.println(arguments.get(i).buffer);
             buffer.append(arguments.get(i).buffer);
         }
         buffer.append(")");
+
         var response = Scopes.get(fName);
         response.buffer = buffer;
         recursionCallDepth.set(n, recursionCallDepth.get(n) - 1);
         if (recursionCallDepth.get(n) == 0) {
-            System.out.println(fName);
             mem.append(buffer);
             recursionCallDepth.remove(n);
         }
         return List.of(response);
-    }
-
-    private static void extracted(List<Expression> boody, StringBuilder builder) {
-
-        var c = 0;
-        for (var i : boody) {
-            if (i.type == TYPE.FUNCTION) {
-                c++;
-                builder.append(i.value).append("(");
-            } else {
-                builder.append(i.value);
-                if (c > 0 && i != boody.get(boody.size() - 1)) {
-                    builder.append(", ");
-                }
-            }
-        }
-        while (c-- > 0) {
-            builder.append(")");
-        }
     }
 
     @Override
@@ -226,7 +185,6 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         ctx.expression()
             .forEach(exp -> list.addAll(visitExpression(exp)));
         return list;
-//        return super.visitExpressions(ctx);
     }
 
     @Override
@@ -267,6 +225,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
     @Override
     public List<Expression> visitParameters(ParametersContext ctx) {
+        List<Expression> argTypes = new ArrayList<>();
         mem.append("(");
 
         for (int i = 0; i < ctx.hint().size(); i++) {
@@ -277,14 +236,14 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             var argType = Expression.exprByHint(ctx.hint(i).getText(), false);
             argType.buffer.append(argName);
             Scopes.defineNewVariable(argName, argType);
-
+            argTypes.add(argType);
             mem.append(argType.getFunctionType()).append(" ")
                 .append(argName);
         }
 
         mem.append(")");
 
-        return null;
+        return argTypes;
     }
 
     @Override
@@ -298,7 +257,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         mem.append(funcExpr.getFunctionType()).append(" ")
             .append(name);
 
-        return null;
+        return List.of(funcExpr);
     }
 
     @Override
