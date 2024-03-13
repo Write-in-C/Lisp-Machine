@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import ru.nsu.valikov.generators.TranslationVisitor;
-
 import java.io.IOException;
 import java.util.Objects;
 
