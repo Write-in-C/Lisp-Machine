@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'java-library'
 }
 
 group = 'ru.nsu.valikov'
@@ -16,6 +17,12 @@ ext {
 
 application {
     mainClass = javaMainClass
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 dependencies {
