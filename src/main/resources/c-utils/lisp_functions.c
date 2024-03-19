@@ -1,6 +1,3 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 int lisp_add_int(int a, int b) {
     return a + b;
 }
