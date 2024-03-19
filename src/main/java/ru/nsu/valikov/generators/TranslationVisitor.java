@@ -54,7 +54,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
         file = "out/" + ctx.filename().IDENT().getText() + ".c";
         try (InputStreamReader stream = new InputStreamReader(
-            Objects.requireNonNull(getClass().getResourceAsStream("/c-utils/startup.c")))) {
+            Objects.requireNonNull(getClass().getResourceAsStream("/c-utils/lisp_functions.c")))) {
             var buffer = new char[1024];
             var read = 0;
             while ((read = stream.read(buffer)) != -1) {
