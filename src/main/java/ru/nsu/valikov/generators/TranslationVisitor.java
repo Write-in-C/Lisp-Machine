@@ -10,6 +10,7 @@ import antlr.ClojureParser.ExpressionsContext;
 import antlr.ClojureParser.IfContext;
 import antlr.ClojureParser.ParametersContext;
 import antlr.ClojureParser.ProgramContext;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
 import ru.nsu.valikov.compiler.Scopes;
 import ru.nsu.valikov.generators.Expression.TYPE;
 import ru.nsu.valikov.generators.Expression.TYPE.FUNCTION_TYPE;
@@ -33,16 +35,19 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     static {
         Scopes.createNew();
         Scopes.defineNewVariable("lisp_eq_int",
-            new Expression(TYPE.FUNCTION, "lisp_eq_int", FUNCTION_TYPE.BOOLEAN));
+                new Expression(TYPE.FUNCTION, "lisp_eq_int", FUNCTION_TYPE.BOOLEAN));
+        Scopes.defineNewVariable("lisp_leq_int",
+                new Expression(TYPE.FUNCTION, "lisp_leq_int", FUNCTION_TYPE.BOOLEAN));
         Scopes.defineNewVariable("lisp_mul_int",
-            new Expression(TYPE.FUNCTION, "lisp_mul_int", FUNCTION_TYPE.INT));
+                new Expression(TYPE.FUNCTION, "lisp_mul_int", FUNCTION_TYPE.INT));
         Scopes.defineNewVariable("lisp_div_int",
-            new Expression(TYPE.FUNCTION, "lisp_div_int", FUNCTION_TYPE.INT));
+                new Expression(TYPE.FUNCTION, "lisp_div_int", FUNCTION_TYPE.INT));
         Scopes.defineNewVariable("lisp_sub_int",
-            new Expression(TYPE.FUNCTION, "lisp_sub_int", FUNCTION_TYPE.INT));
+                new Expression(TYPE.FUNCTION, "lisp_sub_int", FUNCTION_TYPE.INT));
         Scopes.defineNewVariable("lisp_add_int",
-            new Expression(TYPE.FUNCTION, "lisp_add_int", FUNCTION_TYPE.INT));
+                new Expression(TYPE.FUNCTION, "lisp_add_int", FUNCTION_TYPE.INT));
         functions.put("lisp_eq_int", List.of());
+        functions.put("lisp_leq_int", List.of());
         functions.put("lisp_mul_int", List.of());
         functions.put("lisp_div_int", List.of());
         functions.put("lisp_sub_int", List.of());
@@ -54,7 +59,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
         file = "out/" + ctx.filename().IDENT().getText() + ".c";
         try (InputStreamReader stream = new InputStreamReader(
-            Objects.requireNonNull(getClass().getResourceAsStream("/c-utils/includes.c")))) {
+                Objects.requireNonNull(getClass().getResourceAsStream("/c-utils/includes.c")))) {
             var buffer = new char[1024];
             var read = 0;
             while ((read = stream.read(buffer)) != -1) {
@@ -83,14 +88,14 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         mem.append(" ? ");
 
         var then = visitThen(ctx.then());
-        var last=then.getLast();
+        var last = then.getLast();
         if (last.type != TYPE.FUNCTION) {
             mem.append(last.value);
         }
         mem.append(" : ");
 
         var els = visitElse(ctx.else_());
-        last=els.getLast();
+        last = els.getLast();
         if (last.type != TYPE.FUNCTION) {
             mem.append(last.value);
         }
@@ -99,17 +104,26 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         return List.of(last);
     }
 
-    List<Integer> recursionCallDepth = new ArrayList<>();
+    List<Integer> innerCallDepth = new ArrayList<>();
+
+//    @Override
+//    public List<Expression> visitLet(ClojureParser.LetContext ctx) {
+//        var id=ctx.ident();
+//        var type=Expression.exprByHint(ctx.hint().getText(), false);
+//
+//
+//    }
 
     @Override
     public List<Expression> visitCall(CallContext ctx) {
-        var n = recursionCallDepth.size() - 1;
-        recursionCallDepth.set(n, recursionCallDepth.get(n) + 1);
+        var n = innerCallDepth.size() - 1;
+        innerCallDepth.set(n, innerCallDepth.get(n) + 1);
         var arguments = visitArguments(ctx.arguments());
+//        System.out.println(arguments.stream().map(im-> im.buffer).toList());
         var defaultPrefix = "";
         var defaultType = FUNCTION_TYPE.NOT_A_FUNCTION;
         if (arguments.stream()
-            .allMatch(i -> i.type == TYPE.INT || i.functionType == FUNCTION_TYPE.INT)) {
+                .allMatch(i -> i.type == TYPE.INT || i.functionType == FUNCTION_TYPE.INT)) {
             defaultPrefix = "_int";
             defaultType = FUNCTION_TYPE.INT;
         }
@@ -120,6 +134,12 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         switch (fName) {
             case "=" -> {
                 fName = "lisp_eq%s".formatted(defaultPrefix);
+                buffer.append(fName);
+//                yield List.of(new Expression(TYPE.FUNCTION, fName,
+//                    FUNCTION_TYPE.BOOLEAN));
+            }
+            case "<=" -> {
+                fName = "lisp_leq%s".formatted(defaultPrefix);
                 buffer.append(fName);
 //                yield List.of(new Expression(TYPE.FUNCTION, fName,
 //                    FUNCTION_TYPE.BOOLEAN));
@@ -169,12 +189,14 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         }
         buffer.append(")");
 
-        var response = Scopes.get(fName);
+        var response = new Expression(TYPE.NONE, "");
         response.buffer = buffer;
-        recursionCallDepth.set(n, recursionCallDepth.get(n) - 1);
-        if (recursionCallDepth.get(n) == 0) {
+//        response.buffer = buffer;
+        innerCallDepth.set(n, innerCallDepth.get(n) - 1);
+        if (innerCallDepth.get(n) == 0) {
+//            System.out.println(buffer);
             mem.append(buffer);
-            recursionCallDepth.remove(n);
+            innerCallDepth.remove(n);
         }
         return List.of(response);
     }
@@ -183,7 +205,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     public List<Expression> visitExpressions(ExpressionsContext ctx) {
         List<Expression> list = new ArrayList<>();
         ctx.expression()
-            .forEach(exp -> list.addAll(visitExpression(exp)));
+                .forEach(exp -> list.addAll(visitExpression(exp)));
         return list;
     }
 
@@ -191,8 +213,8 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     public List<Expression> visitExpression(ExpressionContext ctx) {
 
         if (ctx.call() != null) {
-            if (recursionCallDepth.isEmpty()) {
-                recursionCallDepth.add(0);
+            if (innerCallDepth.isEmpty()) {
+                innerCallDepth.add(0);
             }
             return visitCall(ctx.call());
         }
@@ -200,7 +222,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         if (ctx.atom() != null) {
             if (ctx.atom().number() != null) {
                 var r = new Expression(Expression.TYPE.INT,
-                    ctx.atom().number().getText());
+                        ctx.atom().number().getText());
                 r.buffer.append(ctx.atom().getText());
                 return List.of(r);
             }
@@ -238,7 +260,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             Scopes.defineNewVariable(argName, argType);
             argTypes.add(argType);
             mem.append(argType.getFunctionType()).append(" ")
-                .append(argName);
+                    .append(argName);
         }
 
         mem.append(")");
@@ -255,7 +277,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         Scopes.defineNewVariable(name, funcExpr);
 
         mem.append(funcExpr.getFunctionType()).append(" ")
-            .append(name);
+                .append(name);
 
         return List.of(funcExpr);
     }
@@ -264,15 +286,16 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     public List<Expression> visitArguments(ArgumentsContext ctx) {
         List<Expression> list = new ArrayList<>();
         ctx.expression()
-            .forEach(exp -> list.addAll(visitExpression(exp)));
+                .forEach(exp -> list.addAll(visitExpression(exp)));
         return list;
     }
 
     @Override
     public List<Expression> visitDefn(DefnContext ctx) {
-        Scopes.createNew();
 
         visitDefnID(ctx.defnID());
+
+        Scopes.createNew();
         visitParameters(ctx.parameters());
 
         mem.append(" {\n    return ");

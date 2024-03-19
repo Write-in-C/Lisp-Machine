@@ -84,6 +84,7 @@ public class Expression {
             case "Integer" -> new Expression(TYPE.INT);
             case "Double" -> new Expression(TYPE.DOUBLE);
             case "Boolean" -> new Expression(TYPE.BOOLEAN);
+            case "java.util.function.Function" -> new Expression(TYPE.FUNCTION);
             default -> throw new IllegalStateException("should not reach here:" + hint);
         };
     }

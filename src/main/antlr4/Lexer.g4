@@ -18,7 +18,9 @@ IF : 'if';
 
 DEFN : 'defn';
 
-IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB | ADD;
+LET : 'let';
+
+IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB | ADD | LEQ;
 
 //EXTENDED_STRING
 //    : (SYMBOLS | LETTER | DIGIT)+;
@@ -28,6 +30,8 @@ INT : DIGIT+ ;
 // arithmetics
 
 EQ: '=';
+
+LEQ: '<=';
 
 MUL: '*';
 

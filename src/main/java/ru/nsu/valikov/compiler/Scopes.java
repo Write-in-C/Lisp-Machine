@@ -1,9 +1,7 @@
 package ru.nsu.valikov.compiler;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+
 import lombok.experimental.UtilityClass;
 import ru.nsu.valikov.generators.Expression;
 import ru.nsu.valikov.generators.Expression.TYPE;
@@ -11,10 +9,11 @@ import ru.nsu.valikov.generators.Expression.TYPE;
 @UtilityClass
 public class Scopes {
 
-    private static final LinkedList<Map<String, Expression>> scopes = new LinkedList<>();
+    private static final Deque<Map<String, Expression>> scopes = new ArrayDeque<>();
 
     public void createNew() {
         scopes.add(new HashMap<>());
+//        System.out.println("created" + scopes);
     }
 
     public boolean contains(String name) {
@@ -24,11 +23,11 @@ public class Scopes {
     public void defineNewVariable(String name, Expression var) {
         if (contains(name) && getType(name) != var.type) {
             throw new RuntimeException(
-                ("""
-                    Duplicated variable names in intersected scopes.\s
-                    Try to use different name.\s
-                    Get: %s""").formatted(
-                    name));
+                    ("""
+                            Duplicated variable names in intersected scopes.\s
+                            Try to use different name.\s
+                            Get: %s""").formatted(
+                            name));
         }
         scopes.getLast().put(name, var);
     }
@@ -62,14 +61,15 @@ public class Scopes {
                     return;
                 }
                 throw new RuntimeException(
-                    "Cannot assign INT to not INT variable: %s %s".formatted(name, val.type));
+                        "Cannot assign INT to not INT variable: %s %s".formatted(name, val.type));
             }
         }
         throw new AssertionError("should not reach here");
     }
 
     public void deleteLast() {
-        scopes.pop();
+        scopes.pollLast();
+//        System.out.println("delete " + scopes);
     }
 
     public TYPE getType(String name) {
@@ -85,11 +85,11 @@ public class Scopes {
         throw new AssertionError("Should not reach here");
     }
 
-    public Expression get(String name){
+    public Expression get(String name) {
         return scopes.stream()
-            .map(i -> i.get(name))
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No variable with such name: %s".formatted(name)));
+                .map(i -> i.get(name))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No variable with such name: %s".formatted(name)));
     }
 }

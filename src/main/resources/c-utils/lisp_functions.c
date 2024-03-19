@@ -22,3 +22,6 @@ int lisp_eq_int(int a, int b) {
     return a == b;
 }
 
+int lisp_leq_int(int a, int b) {
+    return a == b;
+}

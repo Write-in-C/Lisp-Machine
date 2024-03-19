@@ -14,6 +14,7 @@ expression
     | if
     | defn // for now
     | list
+    | let
     ;
 
 list : OP expressions CP;
@@ -67,3 +68,6 @@ idents: ident*;
 arguments:
     (expression)*
     ;
+
+let
+    : LET SO hint ident expression SC;
