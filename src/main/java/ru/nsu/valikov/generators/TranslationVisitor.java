@@ -1,6 +1,7 @@
 package ru.nsu.valikov.generators;
 
 import antlr.ClojureBaseVisitor;
+import antlr.ClojureParser;
 import antlr.ClojureParser.ArgumentsContext;
 import antlr.ClojureParser.CallContext;
 import antlr.ClojureParser.DefnContext;
@@ -84,48 +85,64 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     public List<Expression> visitIf(IfContext ctx) {
         Scopes.createNew();
 
-        visitIfBody(ctx.ifBody());
-        mem.append(" ? ");
+        var pseudo = new StringBuilder();
+
+        var if_ = visitIfBody(ctx.ifBody()).getLast().buffer;
+        pseudo.append(if_);
+
+        pseudo.append(" ? ");
 
         var then = visitThen(ctx.then());
         var last = then.getLast();
-        if (last.type != TYPE.FUNCTION) {
-            mem.append(last.value);
-        }
-        mem.append(" : ");
+        pseudo.append(last.buffer);
+        pseudo.append(" : ");
 
         var els = visitElse(ctx.else_());
         last = els.getLast();
-        if (last.type != TYPE.FUNCTION) {
-            mem.append(last.value);
-        }
+        pseudo.append(last.buffer);
 
         Scopes.deleteLast();
-        return List.of(last);
+        var exp = new Expression(TYPE.NONE);
+        exp.buffer = pseudo;
+
+        return List.of(exp);
     }
 
     List<Integer> innerCallDepth = new ArrayList<>();
 
-//    @Override
-//    public List<Expression> visitLet(ClojureParser.LetContext ctx) {
-//        var id=ctx.ident();
-//        var type=Expression.exprByHint(ctx.hint().getText(), false);
-//
-//
-//    }
+    @Override
+    public List<Expression> visitLet(ClojureParser.LetContext ctx) {
+        var params = ctx.parameter();
+        var exprs = ctx.expression();
+        var body = ctx.body;
+
+        var pseudo = new StringBuilder();
+
+        for (int i = 0; i < params.size(); i++) {
+            var p = visitParameter(params.get(i)).getLast();
+            var e = visitExpression(exprs.get(i)).getLast();
+
+            if (e.type == TYPE.INT) {
+                Scopes.setIntValue(p.buffer.toString().split(" ")[1], Integer.parseInt(e.value)); // костылек
+            }
+            pseudo.append(p.buffer).append(" = ").append(e.buffer).append(";\n");
+        }
+
+        pseudo.append(visitExpression(body));
+        var exp = new Expression(TYPE.NONE);
+        exp.buffer = pseudo;
+        return List.of(exp);
+    }
 
     @Override
     public List<Expression> visitCall(CallContext ctx) {
         var n = innerCallDepth.size() - 1;
         innerCallDepth.set(n, innerCallDepth.get(n) + 1);
         var arguments = visitArguments(ctx.arguments());
-//        System.out.println(arguments.stream().map(im-> im.buffer).toList());
         var defaultPrefix = "";
-        var defaultType = FUNCTION_TYPE.NOT_A_FUNCTION;
         if (arguments.stream()
                 .allMatch(i -> i.type == TYPE.INT || i.functionType == FUNCTION_TYPE.INT)) {
             defaultPrefix = "_int";
-            defaultType = FUNCTION_TYPE.INT;
         }
 
         var fName = ctx.ident().getText();
@@ -135,45 +152,31 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             case "=" -> {
                 fName = "lisp_eq%s".formatted(defaultPrefix);
                 buffer.append(fName);
-//                yield List.of(new Expression(TYPE.FUNCTION, fName,
-//                    FUNCTION_TYPE.BOOLEAN));
             }
             case "<=" -> {
                 fName = "lisp_leq%s".formatted(defaultPrefix);
                 buffer.append(fName);
-//                yield List.of(new Expression(TYPE.FUNCTION, fName,
-//                    FUNCTION_TYPE.BOOLEAN));
             }
             case "-" -> {
                 fName = "lisp_sub%s".formatted(defaultPrefix);
                 buffer.append(fName);
-//                yield List.of(new Expression(TYPE.FUNCTION, fName,
-//                    defaultType));
             }
             case "+" -> {
                 fName = "lisp_add%s".formatted(defaultPrefix);
                 buffer.append(fName);
-//                yield List.of(new Expression(TYPE.FUNCTION, fName,
-//                    defaultType));
             }
             case "*" -> {
                 fName = "lisp_mul%s".formatted(defaultPrefix);
                 buffer.append(fName);
-//                yield List.of(new Expression(TYPE.FUNCTION, fName,
-//                    defaultType));
             }
             case "/" -> {
                 fName = "lisp_div%s".formatted(defaultPrefix);
                 buffer.append(fName);
-//                yield List.of(new Expression(TYPE.FUNCTION, fName,
-//                    defaultType));
             }
             default -> {
                 if (functions.containsKey(fName)) {
                     buffer.append(fName);
                     break;
-//                    yield List.of(
-//                        new Expression(TYPE.FUNCTION, fName, Scopes.get(fName).functionType));
                 }
 
                 throw new RuntimeException("Should not reach here: " + ctx.ident().getText());
@@ -191,11 +194,9 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
 
         var response = new Expression(TYPE.NONE, "");
         response.buffer = buffer;
-//        response.buffer = buffer;
         innerCallDepth.set(n, innerCallDepth.get(n) - 1);
         if (innerCallDepth.get(n) == 0) {
-//            System.out.println(buffer);
-            mem.append(buffer);
+            System.out.println(buffer);
             innerCallDepth.remove(n);
         }
         return List.of(response);
@@ -204,6 +205,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     @Override
     public List<Expression> visitExpressions(ExpressionsContext ctx) {
         List<Expression> list = new ArrayList<>();
+        System.out.println(ctx.expression().getLast().getText());
         ctx.expression()
                 .forEach(exp -> list.addAll(visitExpression(exp)));
         return list;
@@ -228,6 +230,7 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             }
             if (ctx.atom().ident() != null) {
                 var r = Scopes.get(ctx.atom().ident().getText());
+//                r.buffer.append(r.value);
                 return List.of(r);
             }
             return visitAtom(ctx.atom());
@@ -242,30 +245,39 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
             visitDefn(ctx.defn());
         }
 
+        if (ctx.let() != null) {
+            return visitLet(ctx.let());
+        }
+
         return List.of(new Expression(TYPE.NONE, ""));
     }
 
     @Override
-    public List<Expression> visitParameters(ParametersContext ctx) {
-        List<Expression> argTypes = new ArrayList<>();
-        mem.append("(");
+    public List<Expression> visitParameter(ClojureParser.ParameterContext ctx) {
+        var argName = ctx.ident().getText();
+        var argType = Expression.exprByHint(ctx.hint().getText(), false);
+        var n = Expression.exprByHint(ctx.hint().getText(), false);
+        n.buffer.append(argName);
+        Scopes.defineNewVariable(argName, n);
+        argType.buffer.append(argType.getFunctionType()).append(" ").append(argName);
+        return List.of(argType);
+    }
 
-        for (int i = 0; i < ctx.hint().size(); i++) {
+    @Override
+    public List<Expression> visitParameters(ParametersContext ctx) {
+        var pseudo = new StringBuilder();
+
+        for (int i = 0; i < ctx.parameter().size(); i++) {
             if (i > 0) {
-                mem.append(", ");
+                pseudo.append(", ");
             }
-            var argName = ctx.ident(i).getText();
-            var argType = Expression.exprByHint(ctx.hint(i).getText(), false);
-            argType.buffer.append(argName);
-            Scopes.defineNewVariable(argName, argType);
-            argTypes.add(argType);
-            mem.append(argType.getFunctionType()).append(" ")
-                    .append(argName);
+            var param = visitParameter(ctx.parameter(i)).getLast().buffer;
+            pseudo.append(param);
         }
 
-        mem.append(")");
-
-        return argTypes;
+        var exp = new Expression(TYPE.NONE);
+        exp.buffer = pseudo;
+        return List.of(exp);
     }
 
     @Override
@@ -276,10 +288,13 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
         var funcExpr = Expression.exprByHint(ctx.hint().getText(), true);
         Scopes.defineNewVariable(name, funcExpr);
 
-        mem.append(funcExpr.getFunctionType()).append(" ")
+        var pseudo = new StringBuilder();
+        pseudo.append(funcExpr.getFunctionType()).append(" ")
                 .append(name);
+        var exp = new Expression(TYPE.NONE);
+        exp.buffer = pseudo;
 
-        return List.of(funcExpr);
+        return List.of(exp);
     }
 
     @Override
@@ -293,14 +308,20 @@ public class TranslationVisitor extends ClojureBaseVisitor<List<Expression>> {
     @Override
     public List<Expression> visitDefn(DefnContext ctx) {
 
-        visitDefnID(ctx.defnID());
+        var signature = visitDefnID(ctx.defnID()).getLast().buffer;
 
         Scopes.createNew();
-        visitParameters(ctx.parameters());
+        var params = visitParameters(ctx.parameters()).getLast().buffer;
+        var body = visitExpressions(ctx.expressions());
 
-        mem.append(" {\n    return ");
+        mem.append(signature).append("(").append(params).append(")").append(" {\n");
+
+        for (int i = 0; i < body.size() - 1; i++) {
+            mem.append(body.get(i).buffer).append(";");
+        }
+        mem.append("    return ");
+        mem.append(body.getLast().buffer);
         shouldPrint = true;
-        visitExpressions(ctx.expressions());
         mem.append(";");
         mem.append("\n}\n");
         Scopes.deleteLast();

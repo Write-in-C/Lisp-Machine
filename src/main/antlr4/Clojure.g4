@@ -53,9 +53,13 @@ then: expression;
 
 else: expression;
 
+parameter
+    : hint ident
+    ;
+
 parameters
   :
-  (hint ident)*
+  parameter*
   ;
 
 defnID: ident hint;
@@ -70,4 +74,4 @@ arguments:
     ;
 
 let
-    : LET SO hint ident expression SC;
+    : LET SO (parameter expression)* SC body=expression;
