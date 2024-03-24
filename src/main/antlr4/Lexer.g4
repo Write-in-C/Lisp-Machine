@@ -18,7 +18,11 @@ IF : 'if';
 
 DEFN : 'defn';
 
-IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB | ADD;
+FN : 'fn';
+
+LET : 'let';
+
+IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB | ADD | LEQ;
 
 //EXTENDED_STRING
 //    : (SYMBOLS | LETTER | DIGIT)+;
@@ -28,6 +32,8 @@ INT : DIGIT+ ;
 // arithmetics
 
 EQ: '=';
+
+LEQ: '<=';
 
 MUL: '*';
 
@@ -50,6 +56,8 @@ INT_HINT : HINT_HEAD 'Integer';
 DOUBLE_HINT : HINT_HEAD 'double';
 
 BOOLEAN_HINT : HINT_HEAD 'Boolean';
+
+NO_HINT : ' ';
 
 fragment HINT_HEAD: '^';
 

@@ -12,7 +12,7 @@ import java.util.Objects;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        var file = "samples/factorial.clj";
+        var file = "samples/factorial_improved.clj";
 
         var stream = CharStreams.fromStream(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream(file)));
 

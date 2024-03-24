@@ -107,6 +107,12 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitElse(ClojureParser.ElseContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ClojureParser#parameter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitParameter(ClojureParser.ParameterContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ClojureParser#parameters}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -136,4 +142,16 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArguments(ClojureParser.ArgumentsContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#let}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLet(ClojureParser.LetContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#fn}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFn(ClojureParser.FnContext ctx);
 }

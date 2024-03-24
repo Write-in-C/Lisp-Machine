@@ -4,9 +4,9 @@ import ru.nsu.valikov.generators.Expression.TYPE.FUNCTION_TYPE;
 
 public class Expression {
 
-    public final TYPE type;
-    public FUNCTION_TYPE functionType = FUNCTION_TYPE.NOT_A_FUNCTION;
-    public final String value;
+    public TYPE type = TYPE.NONE;
+    public FUNCTION_TYPE functionType = FUNCTION_TYPE.NONE;
+    public String value = "";
     public StringBuilder buffer = new StringBuilder();
 
     public Expression(TYPE type, String value, FUNCTION_TYPE functionType) {
@@ -20,11 +20,18 @@ public class Expression {
     }
 
     public Expression(TYPE type, String value) {
-        this(type, value, FUNCTION_TYPE.NOT_A_FUNCTION);
+        this(type, value, FUNCTION_TYPE.NONE);
     }
 
     public Expression(TYPE type) {
         this(type, defaultValue(type));
+    }
+
+    public Expression() {
+    }
+
+    public Expression(StringBuilder buffer) {
+        this.buffer = buffer;
     }
 
     public enum TYPE {
@@ -40,7 +47,7 @@ public class Expression {
             INT,
             DOUBLE,
             BOOLEAN,
-            NOT_A_FUNCTION
+            NONE
         }
     }
 
@@ -63,9 +70,9 @@ public class Expression {
                 case VOID -> "void";
                 case INT, BOOLEAN -> "int";
                 case DOUBLE -> "double";
-                case NOT_A_FUNCTION -> "void *"; // should not reach here
+                case NONE -> "Object "; // should not reach here
             };
-            case NONE -> null;
+            case NONE -> "Object ";
         };
     }
 
@@ -76,15 +83,14 @@ public class Expression {
                 case "Integer" -> FUNCTION_TYPE.INT;
                 case "Double" -> FUNCTION_TYPE.DOUBLE;
                 case "Boolean" -> FUNCTION_TYPE.BOOLEAN;
-//                case "void" -> FUNCTION_TYPE.VOID;
-                default -> throw new IllegalStateException("should not reach here:" + hint);
+                default -> FUNCTION_TYPE.NONE;
             });
         }
         return switch (hint) {
             case "Integer" -> new Expression(TYPE.INT);
             case "Double" -> new Expression(TYPE.DOUBLE);
             case "Boolean" -> new Expression(TYPE.BOOLEAN);
-            default -> throw new IllegalStateException("should not reach here:" + hint);
+            default -> new Expression(TYPE.NONE);
         };
     }
 }
