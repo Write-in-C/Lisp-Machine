@@ -13,7 +13,7 @@ expression
     | atom
     | if
     | defn // for now
-    | list
+//    | list
     | let
     ;
 
@@ -25,8 +25,8 @@ atom
     : number
     | ident
     | boolean
+    | fn
     | nil
-//    | arithmetics
     ;
 
 number: INT; // Add more types
@@ -43,6 +43,7 @@ hint
 //    | CHAR_HINT
 //    | STRING_HINT
     | BOOLEAN_HINT
+    | NO_HINT
     ;
 
 if : OP IF ifBody then else CP;
@@ -54,7 +55,7 @@ then: expression;
 else: expression;
 
 parameter
-    : hint ident
+    : hint? ident
     ;
 
 parameters
@@ -62,7 +63,7 @@ parameters
   parameter*
   ;
 
-defnID: ident hint;
+defnID: ident hint?;
 
 defn
     : OP DEFN defnID SO parameters SC body=expressions CP;
@@ -74,4 +75,6 @@ arguments:
     ;
 
 let
-    : LET SO (parameter expression)* SC body=expression;
+    : OP LET SO ident expression SC body=expression CP;
+
+fn: OP FN SO parameters SC body=expressions CP;

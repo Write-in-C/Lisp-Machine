@@ -148,4 +148,10 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitLet(ClojureParser.LetContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ClojureParser#fn}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFn(ClojureParser.FnContext ctx);
 }

@@ -18,6 +18,8 @@ IF : 'if';
 
 DEFN : 'defn';
 
+FN : 'fn';
+
 LET : 'let';
 
 IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB | ADD | LEQ;
@@ -54,6 +56,8 @@ INT_HINT : HINT_HEAD 'Integer';
 DOUBLE_HINT : HINT_HEAD 'double';
 
 BOOLEAN_HINT : HINT_HEAD 'Boolean';
+
+NO_HINT : ' ';
 
 fragment HINT_HEAD: '^';
 
