@@ -1,6 +1,8 @@
 (ns tribonacci)
 
-(defn tribonacci ^Integer [^Integer N]
+(defn tribonacci [N]
   (if ( <= N 2)
     1
     (+ (+ (tribonacci (- N 1)) (tribonacci (- N 2))) (tribonacci (- N 3)))))
+
+(print (tribonacci 5))

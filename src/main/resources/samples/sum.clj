@@ -1,4 +1,5 @@
 (ns sum)
-(defn sum ^Integer [^Integer a ^Integer b]
+(defn sum [a b]
      (+ a b))
 
+(print (sum 15 27))

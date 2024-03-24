@@ -1,5 +1,6 @@
 (ns sum_with_let)
-(defn sum_with_let ^Integer []
-      (let [^Integer a 5
-            ^Integer b 10] (+ a b))
-            (+ a b)
+(defn sum_with_let []
+      (let [a 5]
+            (let [b 10] (+ a b))))
+
+(print (sum_with_let))
