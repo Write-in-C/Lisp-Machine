@@ -3,6 +3,8 @@ lexer grammar Lexer;
 // program
 NS : 'ns';
 
+NIL : 'nil';
+
 //FILENAME : EXTENDED_STRING; // change
 
 //basics
@@ -19,6 +21,8 @@ IF : 'if';
 DEFN : 'defn';
 
 FN : 'fn';
+
+CONS : 'cons';
 
 LET : 'let';
 
@@ -45,7 +49,6 @@ BOOLEAN
     : 'true'
     | 'false';
 
-NIL : 'nil';
 
 WHITESPACE : [ \r\n\t] + -> skip;
 
@@ -56,6 +59,8 @@ INT_HINT : HINT_HEAD 'Integer';
 DOUBLE_HINT : HINT_HEAD 'double';
 
 BOOLEAN_HINT : HINT_HEAD 'Boolean';
+
+FUNCTION_HINT : HINT_HEAD 'java.lang.function';
 
 NO_HINT : ' ';
 

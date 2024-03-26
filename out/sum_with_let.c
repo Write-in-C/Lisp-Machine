@@ -9,6 +9,7 @@ Object sum_with_let() {
 }
 
 int main() {
+    nil.t = NIL;
     lisp_printf(sum_with_let());
     return 0;
 }

@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <malloc.h>
 #include "lisp_functions.h"
 
 #define t1 createInt(0)
@@ -9,9 +9,10 @@ Object factorial(Object n) {
 }
 
 int main() {
-    lisp_print_0(factorial(createInt(10)));
-    lisp_print_0(factorial(createInt(5)));
-    lisp_print_0(factorial(createInt(7)));
+    nil.t = NIL;
+    lisp_printf(factorial(createInt(10)));
+    lisp_printf(factorial(createInt(5)));
+    lisp_printf(factorial(createInt(7)));
     return 0;
 }
 
