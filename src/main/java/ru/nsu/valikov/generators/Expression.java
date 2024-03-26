@@ -90,6 +90,7 @@ public class Expression {
             case "Integer" -> new Expression(TYPE.INT);
             case "Double" -> new Expression(TYPE.DOUBLE);
             case "Boolean" -> new Expression(TYPE.BOOLEAN);
+            case "java.lang.function" -> new Expression(TYPE.FUNCTION);
             default -> new Expression(TYPE.NONE);
         };
     }

@@ -11,7 +11,7 @@ public class Scopes {
 
     private static final Deque<Map<String, String>> scopes = new ArrayDeque<>();
 
-    public static final Map<String, List<Expression>> functions = new HashMap<>();
+    public static final Map<String, String> functions = new HashMap<>();
 
     public void createNew() {
         scopes.add(new HashMap<>());
@@ -43,5 +43,9 @@ public class Scopes {
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No variable with such name: %s".formatted(name)));
+    }
+
+    public boolean isNonOuterFunction(String name) {
+        return !scopes.getFirst().containsKey(name);
     }
 }

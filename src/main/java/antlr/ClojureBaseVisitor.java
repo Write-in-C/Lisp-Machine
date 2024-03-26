@@ -53,6 +53,13 @@ public class ClojureBaseVisitor<T> extends AbstractParseTreeVisitor<T> implement
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitList_elem(ClojureParser.List_elemContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitCall(ClojureParser.CallContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

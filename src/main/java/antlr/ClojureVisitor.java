@@ -41,6 +41,12 @@ public interface ClojureVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitList(ClojureParser.ListContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ClojureParser#list_elem}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitList_elem(ClojureParser.List_elemContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ClojureParser#call}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

@@ -7,6 +7,7 @@ Object fibonacci(Object N) {
 }
 
 int main() {
+    nil.t = NIL;
     lisp_printf(fibonacci(createInt(20)));
     return 0;
 }

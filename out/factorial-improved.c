@@ -10,6 +10,7 @@ Object factorial(Object n) {
 }
 
 int main() {
+    nil.t = NIL;
     lisp_printf(factorial(createInt(10)));
     return 0;
 }

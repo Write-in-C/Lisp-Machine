@@ -7,6 +7,7 @@ Object sum(Object a, Object b) {
 }
 
 int main() {
+    nil.t = NIL;
     lisp_printf(sum(createInt(15), createInt(27)));
     return 0;
 }

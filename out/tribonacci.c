@@ -7,6 +7,7 @@ Object tribonacci(Object N) {
 }
 
 int main() {
+    nil.t = NIL;
     lisp_printf(tribonacci(createInt(5)));
     return 0;
 }

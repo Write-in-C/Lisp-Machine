@@ -5,7 +5,7 @@
 #include <malloc.h>
 
 enum Type {
-    INT, BOOL
+    INT, BOOL, ELEM, FUNC, NIL
 };
 
 struct Int {
@@ -18,17 +18,33 @@ struct Bool {
     int v;
 };
 
+struct Elem {
+    enum Type t;
+    union Object * fst;
+    union Object * snd;
+};
+
+struct Func {
+    enum Type t;
+    void *f;
+};
+
+
 union Object {
     enum Type t;
     struct Int i;
     struct Bool b;
+    struct Elem e;
+    struct Func f;
 };
 
 typedef union Object Object;
 
-Object createInt(int n);
+Object createInt(int i);
 
 Object createBool(int b);
+
+Object createElem(Object fst, Object snd);
 
 Object lisp_add(Object a, Object b);
 
@@ -46,6 +62,10 @@ Object lisp_eq(Object a, Object b);
 
 Object lisp_not(Object a);
 
+Object lisp_list_fst(Object a);
+
+Object lisp_list_snd(Object b);
+
 void lisp_printf(Object a);
 
-#endif
+#endif /* LISP_FUNCTIONS_H */
