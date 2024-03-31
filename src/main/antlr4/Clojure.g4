@@ -9,24 +9,26 @@ filename : OP NS IDENT CP;
 expressions : expression*;
 
 expression
-    : call
+    : list
+    | call
     | atom
     | if
     | defn // for now
-//    | list
     | let
     ;
 
-list : OP expressions CP;
+list : OP list_elem CP;
+
+list_elem : CONS expression (expression | OP list_elem CP);
 
 call : OP ident arguments CP;
 
 atom
     : number
-    | ident
-    | boolean
-    | fn
     | nil
+    | boolean
+    | ident
+    | fn
     ;
 
 number: INT; // Add more types
@@ -40,7 +42,7 @@ nil : NIL;
 hint
     : INT_HINT
     | DOUBLE_HINT
-//    | CHAR_HINT
+    | FUNCTION_HINT
 //    | STRING_HINT
     | BOOLEAN_HINT
     | NO_HINT
