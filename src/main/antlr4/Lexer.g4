@@ -5,8 +5,6 @@ NS : 'ns';
 
 NIL : 'nil';
 
-//FILENAME : EXTENDED_STRING; // change
-
 //basics
 OP : '(';
 
@@ -28,8 +26,6 @@ LET : 'let';
 
 IDENT : LETTER (DIGIT | LETTER | SYMBOLS)* | EQ | MUL | SUB | ADD | LEQ;
 
-//EXTENDED_STRING
-//    : (SYMBOLS | LETTER | DIGIT)+;
 
 INT : DIGIT+ ;
 

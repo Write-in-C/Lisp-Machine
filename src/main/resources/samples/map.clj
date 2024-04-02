@@ -1,4 +1,5 @@
 (ns map)
+
 (defn map [^java.lang.function foo xs]
   (if (= nil xs)
     nil

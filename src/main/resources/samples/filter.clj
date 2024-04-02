@@ -1,4 +1,5 @@
 (ns filter)
+
 (defn filter [^java.lang.function foo xs]
   (if (= xs nil)
     nil

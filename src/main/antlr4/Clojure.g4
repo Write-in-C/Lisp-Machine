@@ -40,11 +40,7 @@ boolean: BOOLEAN;
 nil : NIL;
 
 hint
-    : INT_HINT
-    | DOUBLE_HINT
-    | FUNCTION_HINT
-//    | STRING_HINT
-    | BOOLEAN_HINT
+    : FUNCTION_HINT
     | NO_HINT
     ;
 
