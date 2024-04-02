@@ -50,7 +50,6 @@ Object lisp_sub(Object a, Object b) {
     return a;
 }
 
-
 Object lisp_mul(Object a, Object b) {
     if (a.t == INT && b.t == INT) {
         a.i.v = a.i.v * b.i.v;
@@ -95,8 +94,8 @@ Object lisp_leq(Object a, Object b) {
 }
 
 Object lisp_eq(Object a, Object b) {
-    if (a.t == NIL) {
-        if (b.t == NIL) {
+    if (a.t == NIL || b.t == NIL) {
+        if (b.t == NIL && a.t == NIL) {
             return createBool(1);
         }
         return createBool(0);
@@ -104,9 +103,10 @@ Object lisp_eq(Object a, Object b) {
     if (a.t == INT && b.t == INT) {
         return createBool(a.i.v == b.i.v ? 1 : 0);
     }
-    if (a.t == ELEM && b.t == ELEM) {
-        return createBool(a.e.fst->i.v == b.e.fst->i.v ? 1 : 0);
+    if (a.t == ELEM && a.e.fst->t == INT) {
+        return lisp_eq(*a.e.fst, b);
     }
+    printf("2");
     exit(1);
 }
 
@@ -122,19 +122,16 @@ Object lisp_list_fst(Object a) {
         if (a.e.fst->t == INT) {
             return createInt(a.e.fst->i.v);
         }
-        exit(1);
     }
-    exit(1);
+    return nil;
 }
 
 Object lisp_list_snd(Object a) {
     if (a.t == ELEM) {
-        if (a.e.snd->t == INT) {
-            return createInt(a.e.snd->i.v);
-        }
         return *a.e.snd;
+    } else {
+        return nil;
     }
-    exit(1);
 }
 
 // is not defined
@@ -146,7 +143,7 @@ void lisp_print(Object a) {
     } else {
         if (a.t == ELEM) {
             printf("(");
-            if (a.e.fst != 0)
+            if (a.e.fst)
                 lisp_print(*a.e.fst);
             if (a.e.snd != 0 && a.e.snd->t != NIL) {
                 printf(" ");
@@ -156,6 +153,7 @@ void lisp_print(Object a) {
             return;
         }
     }
+    printf("%d", a.t);
     exit(1);
 }
 
