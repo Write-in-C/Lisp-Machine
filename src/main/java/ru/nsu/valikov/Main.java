@@ -12,13 +12,13 @@ import java.util.Objects;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        var file = "samples/tribonacci.clj";
+        var file = "samples/map.clj";
 
         var stream = CharStreams.fromStream(Objects.requireNonNull(Main.class.getClassLoader().getResourceAsStream(file)));
 
         ClojureLexer lexer = new ClojureLexer(stream);
         ClojureParser parser = new ClojureParser(new CommonTokenStream(lexer));
         ParseTree tree = parser.program();
-        var res = new TranslationVisitor().visit(tree);
+        new TranslationVisitor().visit(tree);
     }
 }
