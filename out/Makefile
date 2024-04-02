@@ -10,7 +10,7 @@ $(BUILD_DIR)/main: main.o
 	mkdir -p $(BUILD_DIR)
 	$(CC) $(LDFLAGS) $^ -o $@ $(LIBS)
 
-main.o: factorial.c
+main.o: all_in.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

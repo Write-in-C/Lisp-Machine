@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <malloc.h>
 #include "lisp_functions.h"
 
 Object list() {
@@ -8,6 +6,7 @@ Object list() {
 
 int main() {
     nil.t = NIL;
+    lisp_printf(list());
     return 0;
 }
 

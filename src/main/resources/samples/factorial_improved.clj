@@ -1,4 +1,4 @@
-(ns factorial-improved)
+(ns factorial_improved)
 
 (defn helper [n acc]
       (if (= 1 n)

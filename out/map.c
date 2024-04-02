@@ -1,9 +1,7 @@
-#include <stdio.h>
-#include <malloc.h>
 #include "lisp_functions.h"
 
 Object f0(Object n) {
-    return lisp_add(n, createInt(42));
+    return lisp_mul(n, createInt(777));
 }
 
 Object map(Object (*foo)(Object), Object xs) {

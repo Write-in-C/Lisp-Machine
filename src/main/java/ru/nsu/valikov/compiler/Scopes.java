@@ -1,10 +1,8 @@
 package ru.nsu.valikov.compiler;
 
-import java.util.*;
-
 import lombok.experimental.UtilityClass;
-import ru.nsu.valikov.generators.Expression;
-import ru.nsu.valikov.generators.Expression.TYPE;
+
+import java.util.*;
 
 @UtilityClass
 public class Scopes {
@@ -23,14 +21,6 @@ public class Scopes {
 
     public void defineNewVariable(String name, String alias) {
         scopes.getLast().put(name, alias);
-    }
-
-    public void setValue(String name, String value) {
-        if (!contains(name)) {
-            defineNewVariable(name, value);
-            return;
-        }
-        throw new AssertionError("should not reach here");
     }
 
     public void deleteLast() {

@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <malloc.h>
 #include "lisp_functions.h"
 
 Object tribonacci(Object N) {
